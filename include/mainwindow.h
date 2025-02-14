@@ -49,8 +49,6 @@ private:
     QLabel *stopBitsLabel;
     QLabel *flowLabel;
 
-    int m_nOpen = 0;
-
     void populateAvailablePorts();   // 사용 가능한 포트를 검색하고 ComboBox에 추가
     void logClear();
     void optionStateChanged(int oState);

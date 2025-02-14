@@ -255,8 +255,6 @@ void MainWindow::closeSerialPort()
 {
     if (serialPort->isOpen())
     {
-        m_nOpen = 1;
-
         disconnect(serialPort, &QSerialPort::readyRead, this, &MainWindow::readSerialData);
         serialPort->close();
         logModel->appendRow(new QStandardItem("+++++=++++++++++++++++++++++++++"));
@@ -274,7 +272,7 @@ void MainWindow::closeSerialPort()
 void MainWindow::logClear()
 {
     logModel->clear();
-    m_nOpen = 0;
+    optionStateChanged(SERIAL_PORT_STATE::SERIAL_PORT_NONE);
 }
 
 void MainWindow::optionStateChanged(int oState)
