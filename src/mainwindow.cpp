@@ -292,11 +292,11 @@ void MainWindow::optionStateChanged(int oState)
     {
         openButton->setEnabled(true);   // Open 버튼 활성화
         closeButton->setEnabled(false);  // Close 버튼 비활성화
-        portSelector->setEnabled(false);  // 포트 선택 활성화
-        baudrateSelector->setEnabled(false);  // Baudrate 선택 활성화
-        dataBitsSelector->setEnabled(false);
-        paritySelector->setEnabled(false);
-        stopBitsSelector->setEnabled(false);
-        flowControlSelector->setEnabled(false);
+        portSelector->setEnabled(true);  // 포트 선택 활성화
+        baudrateSelector->setEnabled(true);  // Baudrate 선택 활성화
+        dataBitsSelector->setEnabled(true);
+        paritySelector->setEnabled(true);
+        stopBitsSelector->setEnabled(true);
+        flowControlSelector->setEnabled(true);
     }
 }
