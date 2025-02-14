@@ -239,16 +239,15 @@ void MainWindow::openSerialPort()
         logModel->appendRow(new QStandardItem("> Opened port: [ " + selectedPortName + " ] at [ " + selectedBaudRate + " ] baud"));
         qDebug() << "Opened port:" << selectedPortName << "at" << selectedBaudRate << "baud";
 
-        openButton->setEnabled(false);  // Open 버튼 비활성화
-        closeButton->setEnabled(true);  // Close 버튼 활성화
-        portSelector->setEnabled(false);  // 포트 선택 비활성화
-        baudrateSelector->setEnabled(false);  // Baudrate 선택 비활성화
+        optionStateChanged(SERIAL_PORT_STATE::SERIAL_PORT_CLOSE);   //toggle
     }
     else
     {
         serialPort->close();
         logModel->appendRow(new QStandardItem("** !.!. Failed to open port: [ " + selectedPortName + " ]"));
         qDebug() << "Failed to open port:" << serialPort->errorString();
+
+        optionStateChanged(SERIAL_PORT_STATE::SERIAL_PORT_OPEN);    //toggle
     }
 }
 
@@ -256,7 +255,7 @@ void MainWindow::closeSerialPort()
 {
     if (serialPort->isOpen())
     {
-        m_nOpen = 0;
+        m_nOpen = 1;
 
         disconnect(serialPort, &QSerialPort::readyRead, this, &MainWindow::readSerialData);
         serialPort->close();
@@ -265,10 +264,7 @@ void MainWindow::closeSerialPort()
         logModel->appendRow(new QStandardItem("+++++=++++++++++++++++++++++++++"));
         qDebug() << "Closed port.";
 
-        openButton->setEnabled(true);   // Open 버튼 활성화
-        closeButton->setEnabled(false);  // Close 버튼 비활성화
-        portSelector->setEnabled(true);  // 포트 선택 활성화
-        baudrateSelector->setEnabled(true);  // Baudrate 선택 활성화
+        optionStateChanged(SERIAL_PORT_STATE::SERIAL_PORT_OPEN);
 
         populateAvailablePorts();  // 사용 가능한 포트를 다시 검색
     }
@@ -283,21 +279,21 @@ void MainWindow::logClear()
 
 void MainWindow::optionStateChanged(int oState)
 {
-    if(oState)
+    if (oState == SERIAL_PORT_STATE::SERIAL_PORT_CLOSE)
     {
-//        openButton->setEnabled(true);   // Open 버튼 활성화
-//        closeButton->setEnabled(false);  // Close 버튼 비활성화
-        portSelector->setEnabled(true);  // 포트 선택 활성화
-        baudrateSelector->setEnabled(true);  // Baudrate 선택 활성화
-        dataBitsSelector->setEnabled(true);
-        paritySelector->setEnabled(true);
-        stopBitsSelector->setEnabled(true);
-        flowControlSelector->setEnabled(true);
+        openButton->setEnabled(false);   // Open 버튼 활성화
+        closeButton->setEnabled(true);  // Close 버튼 비활성화
+        portSelector->setEnabled(false);  // 포트 선택 활성화
+        baudrateSelector->setEnabled(false);  // Baudrate 선택 활성화
+        dataBitsSelector->setEnabled(false);
+        paritySelector->setEnabled(false);
+        stopBitsSelector->setEnabled(false);
+        flowControlSelector->setEnabled(false);
     }
     else
     {
-//        openButton->setEnabled(true);   // Open 버튼 활성화
-//        closeButton->setEnabled(false);  // Close 버튼 비활성화
+        openButton->setEnabled(true);   // Open 버튼 활성화
+        closeButton->setEnabled(false);  // Close 버튼 비활성화
         portSelector->setEnabled(false);  // 포트 선택 활성화
         baudrateSelector->setEnabled(false);  // Baudrate 선택 활성화
         dataBitsSelector->setEnabled(false);

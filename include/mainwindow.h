@@ -15,13 +15,13 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-//    enum SERIAL_PORT_STATE
-//    {
-//            SERIAL_PORT_OPEN = 0,
-//            SERIAL_PORT_OPEN = 1,
-//            SERIAL_PORT_CLOSE = 2,
-//    };
-//    Q_ENUM(SERIAL_PORT_STATE)
+    enum SERIAL_PORT_STATE
+    {
+            SERIAL_PORT_NONE = 0,
+            SERIAL_PORT_OPEN = 1,
+            SERIAL_PORT_CLOSE = 2,
+    };
+    Q_ENUM(SERIAL_PORT_STATE)
 
 private slots:
     void readSerialData();  // UART 데이터를 읽는 슬롯
