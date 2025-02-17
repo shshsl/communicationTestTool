@@ -15,11 +15,11 @@ TEMPLATE = app
 SOURCES += main.cpp\
                   src/mainwindow.cpp \
                   src/testapp.cpp \
-                  src/serialworker.cpp
+                  src/workerthread.cpp
 
 HEADERS  += include/mainwindow.h \
                    include/testapp.h \
-                   include/serialworker.h
+                   include/workerthread.h
 
 RESOURCES += \
                     qml.qrc

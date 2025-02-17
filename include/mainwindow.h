@@ -7,6 +7,8 @@
 #include <QPushButton>
 #include <QComboBox>
 #include <QLabel>
+//
+#include <QThread>
 
 class MainWindow : public QMainWindow {
     Q_OBJECT

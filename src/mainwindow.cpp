@@ -7,7 +7,6 @@
 #include <QDebug>
 #include <QSerialPortInfo>
 #include <QSerialPort>
-#include <QFrame>
 #include <QApplication>
 
 // loading.
@@ -19,18 +18,21 @@
 #include "include/mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), serialPort(new QSerialPort(this)), logModel(new QStandardItemModel(this))
+    : QMainWindow(parent),
+      serialPort(new QSerialPort(this)),
+      logModel(new QStandardItemModel(this))
 {
     // UI 구성
     auto *mainWidget = new QWidget(this);
     auto *mainLayout = new QGridLayout(mainWidget);
 
-    // QFrame 생성 및 설정 - layout 위치 확인용 test.
-    QFrame *frame = new QFrame;
-    frame->setFrameShape(QFrame::Box);  // 사각형 테두리
-    frame->setFrameShadow(QFrame::Plain);  // 단순한 테두리 스타일
-    frame->setLineWidth(2);  // 테두리 두께 설정
-    mainLayout->addWidget(frame);
+//    #include <QFrame>     // outside of class...
+//    // QFrame 생성 및 설정 - layout 위치 확인용 test.
+//    QFrame *frame = new QFrame;
+//    frame->setFrameShape(QFrame::Box);  // 사각형 테두리
+//    frame->setFrameShadow(QFrame::Plain);  // 단순한 테두리 스타일
+//    frame->setLineWidth(2);  // 테두리 두께 설정
+//    mainLayout->addWidget(frame);
 
     // 로그를 표시할 QListView와 모델 설정
     auto *listView = new QListView(this);
@@ -329,6 +331,7 @@ void MainWindow::showProgressDialog() {
 
     // Worker 스레드 생성
     QThread* workThread = new QThread(this);
+    serialPort->moveToThread(workThread);
 
     connect(workThread, &QThread::started, [=]() {
         bool success = serialPort->open(QIODevice::ReadOnly);
