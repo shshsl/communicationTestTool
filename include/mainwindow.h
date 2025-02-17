@@ -28,6 +28,9 @@ private slots:
     void openSerialPort();  // Open 버튼 클릭 시 호출
     void closeSerialPort(); // Close 버튼 클릭 시 호출
 
+signals:
+    void threadFinished(bool success);
+
 private:
     QSerialPort *serialPort;                    // UART 포트 객체
     QStandardItemModel *logModel;       // QListView의 데이터 모델
@@ -49,9 +52,13 @@ private:
     QLabel *stopBitsLabel;
     QLabel *flowLabel;
 
+    QString m_selectedPort;
+    QString m_selectedBaudRate;
+
     void populateAvailablePorts();   // 사용 가능한 포트를 검색하고 ComboBox에 추가
     void logClear();
     void optionStateChanged(int oState);
+    void showProgressDialog();
 };
 
 #endif // MAINWINDOW_H
