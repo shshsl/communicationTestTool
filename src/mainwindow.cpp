@@ -12,13 +12,11 @@
 // loading.
 #include <QMessageBox>
 #include <QProgressDialog>
-#include <QtConcurrent/QtConcurrent>
-#include <QFutureWatcher>
 
 #include "include/mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent),
+    : /*QMainWindow(parent),*/
       serialPort(new QSerialPort(this)),
       logModel(new QStandardItemModel(this))
 {

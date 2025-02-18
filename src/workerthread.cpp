@@ -14,7 +14,7 @@ WorkerThread::WorkerThread(QThread *parent)
 
 /*
 //// 비동기 UI 업데이트.
-void WorkerThread::showProgressDialog() {
+void MainWindow::showProgressDialog() {
     // QProgressDialog 생성
     QProgressDialog* progress = new QProgressDialog("포트를 여는 중입니다...", "취소", 0, 0, this);
     progress->setWindowModality(Qt::WindowModal);
