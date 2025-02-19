@@ -27,7 +27,7 @@
 /// exec for qml.
 ///
 #include <QApplication>
-#include "include/mainwindow.h"
+#include "include/uartwidget.h"
 
 #include <QTabWidget>
 #include <QLabel>
@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
     QTabWidget tabWidget;
 
     // A 탭 생성
-    MainWindow *uartTab = new MainWindow;
+    UartWidget *uartTab = new UartWidget;
     QVBoxLayout *uartLayout = new QVBoxLayout;
 //    uartLayout->addWidget(new QLabel("This is [ UART ] Tab"));
     uartTab->setLayout(uartLayout);

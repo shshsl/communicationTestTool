@@ -1,28 +1,14 @@
-// main.
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QGridLayout>
-#include <QListView>
-#include <QGroupBox>
-#include <QDebug>
-#include <QSerialPortInfo>
-#include <QSerialPort>
-#include <QApplication>
+#include "include/uartwidget.h"
 
-// loading.
-#include <QMessageBox>
-#include <QProgressDialog>
-
-#include "include/mainwindow.h"
-
-MainWindow::MainWindow(QWidget *parent)
-    : /*QMainWindow(parent),*/
-      serialPort(new QSerialPort(this)),
+UartWidget::UartWidget(QWidget *parent)
+    : serialPort(new QSerialPort(this)),
       logModel(new QStandardItemModel(this))
 {
     // UI 구성
     auto *mainWidget = new QWidget(this);
     auto *mainLayout = new QGridLayout(mainWidget);
+
+    setLayout(mainLayout);
 
 //    #include <QFrame>     // outside of class...
 //    // QFrame 생성 및 설정 - layout 위치 확인용 test.
@@ -138,25 +124,23 @@ MainWindow::MainWindow(QWidget *parent)
     clearBtn->setFixedSize(100, 25);
     mainLayout->addWidget(clearBtn, 1, 1);
 
-    setCentralWidget(mainWidget);
-
     // 초기 상태: Close 버튼 비활성화
     closeButton->setEnabled(false);
 
     // 시그널-슬롯 연결
-    connect(openButton, &QPushButton::clicked, this, &MainWindow::openSerialPort);
-    connect(closeButton, &QPushButton::clicked, this, &MainWindow::closeSerialPort);
-    connect(clearBtn, &QPushButton::clicked, this, &MainWindow::logClear);
+    connect(openButton, &QPushButton::clicked, this, &UartWidget::openSerialPort);
+    connect(closeButton, &QPushButton::clicked, this, &UartWidget::closeSerialPort);
+    connect(clearBtn, &QPushButton::clicked, this, &UartWidget::logClear);
 }
 
-MainWindow::~MainWindow()
+UartWidget::~UartWidget()
 {
     if (serialPort->isOpen()) {
         serialPort->close();
     }
 }
 
-void MainWindow::populateAvailablePorts() {
+void UartWidget::populateAvailablePorts() {
     portSelector->clear();  // 기존 항목 제거
 
     const auto ports = QSerialPortInfo::availablePorts();
@@ -184,10 +168,11 @@ void MainWindow::populateAvailablePorts() {
     }
 }
 
-void MainWindow::readSerialData()
+void UartWidget::readSerialData()
 {
     while (serialPort->canReadLine())
-    {  // 줄 단위로 데이터 읽기
+    {
+        // 줄 단위로 데이터 읽기
         QByteArray data = serialPort->readLine();
         QString logEntry = QString::fromUtf8(data).trimmed();
 
@@ -195,17 +180,27 @@ void MainWindow::readSerialData()
         logModel->appendRow(new QStandardItem(logEntry));
 
         // 로그가 많아지면 자동 스크롤
-        auto *listView = qobject_cast<QListView *>(centralWidget()->layout()->itemAt(0)->widget());
-        if (listView)
+        auto *mainLayout = qobject_cast<QGridLayout *>(layout()); // MainWindow의 레이아웃 가져오기
+        if (mainLayout)
         {
-            listView->scrollToBottom();
+            // 0행 0열에 위치한 QListView 가져오기
+            auto *item = mainLayout->itemAtPosition(0, 0);
+            if (item)
+            {
+                auto *listView = qobject_cast<QListView *>(item->widget());
+                if (listView)
+                {
+                    listView->scrollToBottom();
+                }
+            }
         }
 
-        qDebug() << "Received:" << logEntry;  // 디버그 출력
+        qDebug() << "Received:" << logEntry; // 디버그 출력
     }
 }
 
-void MainWindow::openSerialPort()
+
+void UartWidget::openSerialPort()
 {
     QString selectedPortName = portSelector->currentText();  // 사용자가 선택한 포트 이름 가져오기
     QString selectedBaudRate = baudrateSelector->currentText();  // 사용자가 선택한 Baudrate 가져오기
@@ -269,11 +264,11 @@ void MainWindow::openSerialPort()
 //    }
 }
 
-void MainWindow::closeSerialPort()
+void UartWidget::closeSerialPort()
 {
     if (serialPort->isOpen())
     {
-        disconnect(serialPort, &QSerialPort::readyRead, this, &MainWindow::readSerialData);
+        disconnect(serialPort, &QSerialPort::readyRead, this, &UartWidget::readSerialData);
         serialPort->close();
         logModel->appendRow(new QStandardItem("+++++=++++++++++++++++++++++++++"));
         logModel->appendRow(new QStandardItem("■ Closed port."));
@@ -287,13 +282,13 @@ void MainWindow::closeSerialPort()
 //    optionStateChanged(m_nClose);
 }
 
-void MainWindow::logClear()
+void UartWidget::logClear()
 {
     logModel->clear();
     optionStateChanged(SERIAL_PORT_STATE::SERIAL_PORT_NONE);
 }
 
-void MainWindow::optionStateChanged(int oState)
+void UartWidget::optionStateChanged(int oState)
 {
     if (oState == SERIAL_PORT_STATE::SERIAL_PORT_CLOSE)
     {
@@ -320,7 +315,7 @@ void MainWindow::optionStateChanged(int oState)
 }
 
 //// 비동기 UI 업데이트.
-void MainWindow::showProgressDialog() {
+void UartWidget::showProgressDialog() {
     // QProgressDialog 생성
     QProgressDialog* progress = new QProgressDialog("포트를 여는 중입니다...", "취소", 0, 0, this);
     progress->setWindowModality(Qt::WindowModal);
@@ -343,7 +338,7 @@ void MainWindow::showProgressDialog() {
 
         if (serialPort->isOpen())
         {
-            connect(serialPort, &QSerialPort::readyRead, this, &MainWindow::readSerialData);
+            connect(serialPort, &QSerialPort::readyRead, this, &UartWidget::readSerialData);
 
             logModel->appendRow(new QStandardItem("> Opened port: [ " + m_selectedPort + " ] at [ " + m_selectedBaudRate + " ] baud"));
             qDebug() << "Opened port:" << m_selectedPort << "at" << m_selectedBaudRate << "baud";

@@ -1,21 +1,28 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef UARTWIDGET_H
+#define UARTWIDGET_H
 
-#include <QMainWindow>
-#include <QSerialPort>
-#include <QStandardItemModel>
-#include <QPushButton>
+#include <QApplication>
+#include <QGridLayout>
+#include <QListView>
+#include <QGroupBox>
 #include <QComboBox>
 #include <QLabel>
+#include <QPushButton>
+#include <QStandardItemModel>
+#include <QSerialPort>
+#include <QSerialPortInfo>
+#include <QDebug>
+#include <QMessageBox>
+#include <QProgressDialog>
 //
 #include <QThread>
 
-class MainWindow : public QMainWindow {
+class UartWidget: public QWidget {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    explicit UartWidget(QWidget *parent = nullptr);
+    ~UartWidget();
 
     enum SERIAL_PORT_STATE
     {
@@ -63,4 +70,4 @@ private:
     void showProgressDialog();
 };
 
-#endif // MAINWINDOW_H
+#endif // UARTWIDGET_H
