@@ -180,7 +180,7 @@ void UartWidget::readSerialData()
         logModel->appendRow(new QStandardItem(logEntry));
 
         // 로그가 많아지면 자동 스크롤
-        auto *mainLayout = qobject_cast<QGridLayout *>(layout()); // MainWindow의 레이아웃 가져오기
+        auto *mainLayout = qobject_cast<QGridLayout *>(layout());
         if (mainLayout)
         {
             // 0행 0열에 위치한 QListView 가져오기
