@@ -1,7 +1,7 @@
 #include <QObject>
 #include <QString>
 
-#include "include/testapp.h"
+#include "widget/include/testapp.h"
 
 TestApp::TestApp(QObject *parent) :
     m_textValue("")

@@ -1,4 +1,4 @@
-#include "include/socektwidget.h"
+#include "widget/include/socketwidget.h"
 
 SocektWidget::SocektWidget(QWidget *parent)
 {

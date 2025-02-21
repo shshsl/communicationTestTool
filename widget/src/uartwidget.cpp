@@ -1,4 +1,4 @@
-#include "include/uartwidget.h"
+#include "widget/include/uartwidget.h"
 
 UartWidget::UartWidget(QWidget *parent)
     : serialPort(new QSerialPort(this)),

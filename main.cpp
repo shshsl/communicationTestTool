@@ -27,7 +27,7 @@
 /// exec for cpp.
 ///
 #include <QApplication>
-#include "include/uartwidget.h"
+#include "widget/include/uartwidget.h"
 
 #include <QTabWidget>
 #include <QLabel>

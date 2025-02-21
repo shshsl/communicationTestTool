@@ -13,20 +13,24 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-                  src/testapp.cpp \
-                  src/workerthread.cpp \
-                  src/socketmanager.cpp \
-                  src/uartmanager.cpp \
-                  src/uartwidget.cpp \
-    socketmanager.cpp
+#widget
+                  widget/src/testapp.cpp \
+                  widget/src/uartwidget.cpp \
+                  widget/src/socketwidget.cpp \
+#mgr
+                  manager/src/workerthread.cpp \
+                  manager/src/socketmanager.cpp \
+                  manager/src/uartmanager.cpp \
 
 HEADERS  += \
-                   include/testapp.h \
-                   include/workerthread.h \
-                   include/socketmanager.h \
-                   include/uartmanager.h \
-                   include/uartwidget.h \
-    socketmanager.h
+#widget
+                   widget/include/testapp.h \
+                   widget/include/uartwidget.h \
+                   widget/include/socketwidget.h \
+#mgr
+                   manager/include/workerthread.h \
+                   manager/include/socketmanager.h \
+                   manager/include/uartmanager.h \
 
 RESOURCES += \
                     qml.qrc

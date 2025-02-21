@@ -1,4 +1,4 @@
-#include "socketmanager.h"
+#include "manager/include/socketmanager.h"
 
 SocketManager::SocketManager(QObject *parent) : QObject(parent)
 {

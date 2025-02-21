@@ -1,4 +1,4 @@
-#include "include/workerthread.h"
+#include "manager/include/workerthread.h"
 
 WorkerThread::WorkerThread(QThread *parent)
 {

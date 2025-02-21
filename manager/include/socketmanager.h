@@ -7,7 +7,7 @@ class SocketManager : public QObject
 {
     Q_OBJECT
 public:
-    explicit SocketManager(QObject *parent = 0);
+    explicit SocketManager(QObject *parent = nullptr);
 
 signals:
 
