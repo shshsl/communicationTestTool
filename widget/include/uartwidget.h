@@ -102,7 +102,9 @@ private slots:
     void updateLog(const QString &data);
 
 private:
+    void createComboBoxLayout(QVBoxLayout *parentLayout, const QString &labelText, QComboBox *&comboBox, const QStringList &items, const QString &defaultItem = "");
     void populateAvailablePorts();
+    void logClear();
 
 private:
     UartManager *uartManager;

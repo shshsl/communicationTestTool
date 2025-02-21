@@ -400,63 +400,88 @@ UartWidget::UartWidget(QWidget *parent)
    // gLayout->addWidget(closeButton);
    // gLayout->addWidget(logView);
 
-   // 포트 선택 ComboBox 생성 및 초기화
-   QHBoxLayout *portBoxLayout = new QHBoxLayout();
-   portLabel = new QLabel("COM port : ", this);
-   portSelector = new QComboBox(this);
-   portBoxLayout->addWidget(portLabel);
-   portBoxLayout->addWidget(portSelector);
-   optionGroupLayout->addLayout(portBoxLayout);
+   // // 포트 선택 ComboBox 생성 및 초기화
+   // QHBoxLayout *portBoxLayout = new QHBoxLayout();
+   // portLabel = new QLabel("COM port : ", this);
+   // portSelector = new QComboBox(this);
+   // portBoxLayout->addWidget(portLabel);
+   // portBoxLayout->addWidget(portSelector);
+   // optionGroupLayout->addLayout(portBoxLayout);
 
-   // Baudrate 선택 ComboBox 생성 및 초기화
-   QHBoxLayout *baudBoxLayout = new QHBoxLayout();
-   baudLabel = new QLabel("Baud Rate : ", this);
-   baudrateSelector = new QComboBox(this);
-   baudrateSelector->addItems({"2400", "4800", "9600", "14400", "19200", "38400", "57600", "115200"});  // 일반적으로 사용되는 Baudrate 값 추가
-   baudrateSelector->setCurrentText("115200");  // 기본값 설정
-   baudBoxLayout->addWidget(baudLabel);
-   baudBoxLayout->addWidget(baudrateSelector);
-   optionGroupLayout->addLayout(baudBoxLayout);
+   // // Baudrate 선택 ComboBox 생성 및 초기화
+   // QHBoxLayout *baudBoxLayout = new QHBoxLayout();
+   // baudLabel = new QLabel("Baud Rate : ", this);
+   // baudrateSelector = new QComboBox(this);
+   // baudrateSelector->addItems({"2400", "4800", "9600", "14400", "19200", "38400", "57600", "115200"});  // 일반적으로 사용되는 Baudrate 값 추가
+   // baudrateSelector->setCurrentText("115200");  // 기본값 설정
+   // baudBoxLayout->addWidget(baudLabel);
+   // baudBoxLayout->addWidget(baudrateSelector);
+   // optionGroupLayout->addLayout(baudBoxLayout);
 
-   // DataBits 선택 ComboBox 생성 및 초기화
-   QHBoxLayout *dataBitsBoxLayout = new QHBoxLayout();
-   dataBitsLabel = new QLabel("Data Bits : ", this);
-   dataBitsSelector = new QComboBox(this);
-   dataBitsSelector->addItems({"5", "6", "7", "8"});  // Data5, Data6, Data7, Data8
-   dataBitsSelector->setCurrentText("8");
-   dataBitsBoxLayout ->addWidget(dataBitsLabel);
-   dataBitsBoxLayout ->addWidget(dataBitsSelector);
-   optionGroupLayout->addLayout(dataBitsBoxLayout);
+   // // DataBits 선택 ComboBox 생성 및 초기화
+   // QHBoxLayout *dataBitsBoxLayout = new QHBoxLayout();
+   // dataBitsLabel = new QLabel("Data Bits : ", this);
+   // dataBitsSelector = new QComboBox(this);
+   // dataBitsSelector->addItems({"5", "6", "7", "8"});  // Data5, Data6, Data7, Data8
+   // dataBitsSelector->setCurrentText("8");
+   // dataBitsBoxLayout ->addWidget(dataBitsLabel);
+   // dataBitsBoxLayout ->addWidget(dataBitsSelector);
+   // optionGroupLayout->addLayout(dataBitsBoxLayout);
 
-   // Parity 선택 ComboBox 생성 및 초기화
-   QHBoxLayout *parityBoxLayout = new QHBoxLayout();
-   parityLabel = new QLabel("Parity : ", this);
-   paritySelector = new QComboBox(this);
-   paritySelector->addItems({"No Parity", "Even Parity", "Odd Parity", "Space Parity", "Mark Parity"});
-   paritySelector->setCurrentText("No Parity");
-   parityBoxLayout ->addWidget(parityLabel);
-   parityBoxLayout ->addWidget(paritySelector);
-   optionGroupLayout->addLayout(parityBoxLayout);
+   // // Parity 선택 ComboBox 생성 및 초기화
+   // QHBoxLayout *parityBoxLayout = new QHBoxLayout();
+   // parityLabel = new QLabel("Parity : ", this);
+   // paritySelector = new QComboBox(this);
+   // paritySelector->addItems({"No Parity", "Even Parity", "Odd Parity", "Space Parity", "Mark Parity"});
+   // paritySelector->setCurrentText("No Parity");
+   // parityBoxLayout ->addWidget(parityLabel);
+   // parityBoxLayout ->addWidget(paritySelector);
+   // optionGroupLayout->addLayout(parityBoxLayout);
 
-   // StopBits 선택 ComboBox 생성 및 초기화
-   QHBoxLayout *stopBitsBoxLayout = new QHBoxLayout();
-   stopBitsLabel = new QLabel("Stop Bits : ", this);
-   stopBitsSelector = new QComboBox(this);
-   stopBitsSelector->addItems({"1", "1.5", "2"});  // OneStop, OneAndHalfStop, TwoStop
-   stopBitsSelector->setCurrentText("1");
-   stopBitsBoxLayout ->addWidget(stopBitsLabel);
-   stopBitsBoxLayout ->addWidget(stopBitsSelector);
-   optionGroupLayout->addLayout(stopBitsBoxLayout);
+   // // StopBits 선택 ComboBox 생성 및 초기화
+   // QHBoxLayout *stopBitsBoxLayout = new QHBoxLayout();
+   // stopBitsLabel = new QLabel("Stop Bits : ", this);
+   // stopBitsSelector = new QComboBox(this);
+   // stopBitsSelector->addItems({"1", "1.5", "2"});  // OneStop, OneAndHalfStop, TwoStop
+   // stopBitsSelector->setCurrentText("1");
+   // stopBitsBoxLayout ->addWidget(stopBitsLabel);
+   // stopBitsBoxLayout ->addWidget(stopBitsSelector);
+   // optionGroupLayout->addLayout(stopBitsBoxLayout);
 
-   // FlowControl 선택 ComboBox 생성 및 초기화
-   QHBoxLayout *flowBoxLayout = new QHBoxLayout();
-   flowLabel = new QLabel("Flow Control : ", this);
-   flowControlSelector = new QComboBox(this);
-   flowControlSelector->addItems({"No Flow Control", "Hardware Control", "Software Control"});
-   flowControlSelector->setCurrentText("No Flow Control");
-   flowBoxLayout ->addWidget(flowLabel);
-   flowBoxLayout ->addWidget(flowControlSelector);
-   optionGroupLayout->addLayout(flowBoxLayout);
+   // // FlowControl 선택 ComboBox 생성 및 초기화
+   // QHBoxLayout *flowBoxLayout = new QHBoxLayout();
+   // flowLabel = new QLabel("Flow Control : ", this);
+   // flowControlSelector = new QComboBox(this);
+   // flowControlSelector->addItems({"No Flow Control", "Hardware Control", "Software Control"});
+   // flowControlSelector->setCurrentText("No Flow Control");
+   // flowBoxLayout ->addWidget(flowLabel);
+   // flowBoxLayout ->addWidget(flowControlSelector);
+   // optionGroupLayout->addLayout(flowBoxLayout);
+   // 메인 코드
+//   QVBoxLayout *optionGroupLayout = new QVBoxLayout(); // 부모 레이아웃 생성
+
+   // 포트 선택 ComboBox
+   createComboBoxLayout(optionGroupLayout, "COM port : ", portSelector, {});
+
+   // Baudrate 선택 ComboBox
+   createComboBoxLayout(optionGroupLayout, "Baud Rate : ", baudrateSelector,
+                     {"2400", "4800", "9600", "14400", "19200", "38400", "57600", "115200"}, "115200");
+
+   // DataBits 선택 ComboBox
+   createComboBoxLayout(optionGroupLayout, "Data Bits : ", dataBitsSelector,
+                     {"5", "6", "7", "8"}, "8");
+
+   // Parity 선택 ComboBox
+   createComboBoxLayout(optionGroupLayout, "Parity : ", paritySelector,
+                     {"No Parity", "Even Parity", "Odd Parity", "Space Parity", "Mark Parity"}, "No Parity");
+
+   // StopBits 선택 ComboBox
+   createComboBoxLayout(optionGroupLayout, "Stop Bits : ", stopBitsSelector,
+                     {"1", "1.5", "2"}, "1");
+
+   // FlowControl 선택 ComboBox
+   createComboBoxLayout(optionGroupLayout, "Flow Control : ", flowControlSelector,
+                     {"No Flow Control", "Hardware Control", "Software Control"}, "No Flow Control");
    
    // [ Button ]
    // Open 및 Close 버튼 생성
@@ -481,9 +506,25 @@ UartWidget::UartWidget(QWidget *parent)
    connect(openButton, &QPushButton::clicked, this, &UartWidget::handleOpenButtonClicked);
    connect(closeButton, &QPushButton::clicked, this, &UartWidget::handleCloseButtonClicked);
    connect(uartManager, &UartManager::dataReceived, this, &UartWidget::updateLog);
+   connect(clearBtn, &QPushButton::clicked, this, &UartWidget::logClear);
 
    optionGroupBox->setLayout(optionGroupLayout);
    populateAvailablePorts();
+}
+
+// [option] 공통적인 ComboBox 레이아웃 생성 함수
+void UartWidget::createComboBoxLayout(QVBoxLayout *parentLayout, const QString &labelText, QComboBox *&comboBox, const QStringList &items, const QString &defaultItem)
+{
+   QHBoxLayout *boxLayout = new QHBoxLayout();
+   QLabel *label = new QLabel(labelText);
+   comboBox = new QComboBox();
+   comboBox->addItems(items);
+   if (!defaultItem.isEmpty()) {
+       comboBox->setCurrentText(defaultItem);
+   }
+   boxLayout->addWidget(label);
+   boxLayout->addWidget(comboBox);
+   parentLayout->addLayout(boxLayout);
 }
 
 void UartWidget::populateAvailablePorts()
@@ -529,4 +570,10 @@ void UartWidget::handleCloseButtonClicked()
 void UartWidget::updateLog(const QString &data)
 {
    logModel->appendRow(new QStandardItem(data));
+}
+
+void UartWidget::logClear()
+{
+   logModel->clear();
+   //  optionStateChanged(SERIAL_PORT_STATE::SERIAL_PORT_NONE);
 }
