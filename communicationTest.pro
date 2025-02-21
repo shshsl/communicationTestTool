@@ -17,14 +17,16 @@ SOURCES += main.cpp\
                   src/workerthread.cpp \
                   src/socketmanager.cpp \
                   src/uartmanager.cpp \
-                  src/uartwidget.cpp
+                  src/uartwidget.cpp \
+    socketmanager.cpp
 
 HEADERS  += \
                    include/testapp.h \
                    include/workerthread.h \
                    include/socketmanager.h \
                    include/uartmanager.h \
-                   include/uartwidget.h
+                   include/uartwidget.h \
+    socketmanager.h
 
 RESOURCES += \
                     qml.qrc

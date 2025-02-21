@@ -3,10 +3,15 @@
 
 #include <QObject>
 
-class SocketManager
+class SocketManager : public QObject
 {
+    Q_OBJECT
 public:
-    SocketManager();
+    explicit SocketManager(QObject *parent = 0);
+
+signals:
+
+public slots:
 };
 
 #endif // SOCKETMANAGER_H
