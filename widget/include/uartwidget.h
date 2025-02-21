@@ -1,5 +1,5 @@
-// #ifndef UARTWIDGET_H
-// #define UARTWIDGET_H
+#ifndef UARTWIDGET_H
+#define UARTWIDGET_H
 
 // #include <QApplication>
 // #include <QGridLayout>
@@ -70,13 +70,19 @@
 //     void showProgressDialog();
 // };
 
-// #endif // UARTWIDGET_H
-
-
-#ifndef UARTWIDGET_H
-#define UARTWIDGET_H
 
 #include <QWidget>
+#include <QComboBox>
+#include <QGroupBox>
+#include <QGridLayout>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QListView>
+#include <QStandardItemModel>
+#include <QDebug>
+#include <QLabel>
+
 #include "manager/include/uartmanager.h"
 
 class QComboBox;
@@ -100,12 +106,28 @@ private:
 
 private:
     UartManager *uartManager;
-
-    QComboBox *portSelector;
-    QComboBox *baudrateSelector;
     
     QListView *logView;
     QStandardItemModel *logModel;
+    
+    QSerialPort *serialPort;                    // UART 포트 객체
+    QPushButton *openButton;               // Open 버튼
+    QPushButton *closeButton;               // Close 버튼
+    QPushButton *clearBtn;
+
+    QComboBox *portSelector;               // 포트 선택 ComboBox
+    QComboBox *baudrateSelector;        // Baudrate 선택 ComboBox
+    QComboBox *dataBitsSelector;         // DataBits 선택 ComboBox
+    QComboBox *paritySelector;
+    QComboBox *stopBitsSelector;
+    QComboBox *flowControlSelector;
+
+    QLabel *portLabel;
+    QLabel *baudLabel;
+    QLabel *dataBitsLabel;
+    QLabel *parityLabel;
+    QLabel *stopBitsLabel;
+    QLabel *flowLabel;
 };
 
 #endif // UARTWIDGET_H

@@ -369,43 +369,121 @@
 /////////////////////////===================================================================
 
 #include "widget/include/uartwidget.h"
-#include <QComboBox>
-#include <QPushButton>
-#include <QVBoxLayout>
-#include <QListView>
-#include <QStandardItemModel>
-#include <QDebug>
 
 UartWidget::UartWidget(QWidget *parent)
-    : QWidget(parent), //uartManager(new UartManager(this)),
-      logModel(new QStandardItemModel(this))
+   : QWidget(parent), uartManager(new UartManager(this)),
+   logModel(new QStandardItemModel(this))
 {
-    // UI 구성
-    portSelector = new QComboBox(this);
-    baudrateSelector = new QComboBox(this);
+   // UI 구성
+   auto *gLayout = new QGridLayout(this);
+   setLayout(gLayout);
+   
+   // // QFrame 생성 및 설정 - layout 위치 확인용 test.
+   // QFrame *frame = new QFrame;
+   // frame->setFrameShape(QFrame::Box);  // 사각형 테두리
+   // frame->setFrameShadow(QFrame::Plain);  // 단순한 테두리 스타일
+   // frame->setLineWidth(2);  // 테두리 두께 설정
+   // mainLayout->addWidget(frame);
 
-    QPushButton *openButton = new QPushButton("Open", this);
-    QPushButton *closeButton = new QPushButton("Close", this);
-
-    logView = new QListView(this);
-    logView->setModel(logModel);
-
-    auto layout = new QVBoxLayout(this);
-    layout->addWidget(portSelector);
-    layout->addWidget(baudrateSelector);
-    layout->addWidget(openButton);
-    layout->addWidget(closeButton);
-    layout->addWidget(logView);
-
-    setLayout(layout);
-
-    // 시그널/슬롯 연결
-    connect(openButton, &QPushButton::clicked, this, &UartWidget::handleOpenButtonClicked);
-    connect(closeButton, &QPushButton::clicked, this, &UartWidget::handleCloseButtonClicked);
+   logView = new QListView(this);
+   logView->setModel(logModel);
+   gLayout->addWidget(logView, 0, 0);
     
-    connect(uartManager, &UartManager::dataReceived, this, &UartWidget::updateLog);
+   // [ Options ]
+   auto *optionGroupBox = new QGroupBox();
+   auto *optionGroupLayout = new QVBoxLayout();
+   gLayout->addWidget(optionGroupBox, 0, 1);
 
-    populateAvailablePorts();
+   // gLayout->addWidget(portSelector);
+   // gLayout->addWidget(baudrateSelector);
+   // gLayout->addWidget(openButton);
+   // gLayout->addWidget(closeButton);
+   // gLayout->addWidget(logView);
+
+   // 포트 선택 ComboBox 생성 및 초기화
+   QHBoxLayout *portBoxLayout = new QHBoxLayout();
+   portLabel = new QLabel("COM port : ", this);
+   portSelector = new QComboBox(this);
+   portBoxLayout->addWidget(portLabel);
+   portBoxLayout->addWidget(portSelector);
+   optionGroupLayout->addLayout(portBoxLayout);
+
+   // Baudrate 선택 ComboBox 생성 및 초기화
+   QHBoxLayout *baudBoxLayout = new QHBoxLayout();
+   baudLabel = new QLabel("Baud Rate : ", this);
+   baudrateSelector = new QComboBox(this);
+   baudrateSelector->addItems({"2400", "4800", "9600", "14400", "19200", "38400", "57600", "115200"});  // 일반적으로 사용되는 Baudrate 값 추가
+   baudrateSelector->setCurrentText("115200");  // 기본값 설정
+   baudBoxLayout->addWidget(baudLabel);
+   baudBoxLayout->addWidget(baudrateSelector);
+   optionGroupLayout->addLayout(baudBoxLayout);
+
+   // DataBits 선택 ComboBox 생성 및 초기화
+   QHBoxLayout *dataBitsBoxLayout = new QHBoxLayout();
+   dataBitsLabel = new QLabel("Data Bits : ", this);
+   dataBitsSelector = new QComboBox(this);
+   dataBitsSelector->addItems({"5", "6", "7", "8"});  // Data5, Data6, Data7, Data8
+   dataBitsSelector->setCurrentText("8");
+   dataBitsBoxLayout ->addWidget(dataBitsLabel);
+   dataBitsBoxLayout ->addWidget(dataBitsSelector);
+   optionGroupLayout->addLayout(dataBitsBoxLayout);
+
+   // Parity 선택 ComboBox 생성 및 초기화
+   QHBoxLayout *parityBoxLayout = new QHBoxLayout();
+   parityLabel = new QLabel("Parity : ", this);
+   paritySelector = new QComboBox(this);
+   paritySelector->addItems({"No Parity", "Even Parity", "Odd Parity", "Space Parity", "Mark Parity"});
+   paritySelector->setCurrentText("No Parity");
+   parityBoxLayout ->addWidget(parityLabel);
+   parityBoxLayout ->addWidget(paritySelector);
+   optionGroupLayout->addLayout(parityBoxLayout);
+
+   // StopBits 선택 ComboBox 생성 및 초기화
+   QHBoxLayout *stopBitsBoxLayout = new QHBoxLayout();
+   stopBitsLabel = new QLabel("Stop Bits : ", this);
+   stopBitsSelector = new QComboBox(this);
+   stopBitsSelector->addItems({"1", "1.5", "2"});  // OneStop, OneAndHalfStop, TwoStop
+   stopBitsSelector->setCurrentText("1");
+   stopBitsBoxLayout ->addWidget(stopBitsLabel);
+   stopBitsBoxLayout ->addWidget(stopBitsSelector);
+   optionGroupLayout->addLayout(stopBitsBoxLayout);
+
+   // FlowControl 선택 ComboBox 생성 및 초기화
+   QHBoxLayout *flowBoxLayout = new QHBoxLayout();
+   flowLabel = new QLabel("Flow Control : ", this);
+   flowControlSelector = new QComboBox(this);
+   flowControlSelector->addItems({"No Flow Control", "Hardware Control", "Software Control"});
+   flowControlSelector->setCurrentText("No Flow Control");
+   flowBoxLayout ->addWidget(flowLabel);
+   flowBoxLayout ->addWidget(flowControlSelector);
+   optionGroupLayout->addLayout(flowBoxLayout);
+   
+   // [ Button ]
+   // Open 및 Close 버튼 생성
+   openButton = new QPushButton("Open", this);
+   closeButton = new QPushButton("Close", this);
+
+   // 버튼을 포함한 하단 레이아웃 생성
+   auto *buttonLayout = new QHBoxLayout();
+   buttonLayout->addWidget(openButton);
+   buttonLayout->addWidget(closeButton);
+   gLayout->addLayout(buttonLayout, 1, 0);
+
+   // Clear 버튼 추가
+   clearBtn = new QPushButton("Clear", this);
+   clearBtn->setFixedSize(100, 25);
+   gLayout->addWidget(clearBtn, 1, 1);
+
+   // // 초기 상태: Close 버튼 비활성화
+   // closeButton->setEnabled(false);
+
+   // 시그널/슬롯 연결
+   connect(openButton, &QPushButton::clicked, this, &UartWidget::handleOpenButtonClicked);
+   connect(closeButton, &QPushButton::clicked, this, &UartWidget::handleCloseButtonClicked);
+   connect(uartManager, &UartManager::dataReceived, this, &UartWidget::updateLog);
+
+   optionGroupBox->setLayout(optionGroupLayout);
+   populateAvailablePorts();
 }
 
 void UartWidget::populateAvailablePorts()
@@ -415,13 +493,16 @@ void UartWidget::populateAvailablePorts()
 
    if (ports.isEmpty())
    {
-       portSelector->addItem("No Ports Available");
-       logModel->appendRow(new QStandardItem("** No Ports Available **"));
+      portSelector->addItem("No Ports Available");
+      logModel->appendRow(new QStandardItem("** No Ports Available **"));
    }
    else
    {
-       portSelector->addItems(ports);
-       logModel->appendRow(new QStandardItem("▶️ Ports detected."));
+      portSelector->addItems(ports);
+      logModel->appendRow(new QStandardItem("+++++  ++++++++++++++++++++++++++"));
+      logModel->appendRow(new QStandardItem("▶️ There is currently an available COM port. "));
+      logModel->appendRow(new QStandardItem("+++++  ++++++++++++++++++++++++++"));
+      qDebug() << "Ready To Do Something. ";
    }
 }
 
