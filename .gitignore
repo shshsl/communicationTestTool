@@ -1,2 +1,11 @@
 /build/*
+/debug/*
+/release/*
 *.o
+
+Makefile
+Makefile.*
+
+object_script.*
+*.pro.user
+*.pro.user.*
