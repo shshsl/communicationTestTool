@@ -85,26 +85,31 @@
 
 #include "manager/include/uartmanager.h"
 
-class QComboBox;
-class QListView;
-class QStandardItemModel;
-
 class UartWidget : public QWidget
 {
     Q_OBJECT
 
 public:
     explicit UartWidget(QWidget *parent = nullptr);
+    
+    enum SERIAL_PORT_STATE
+    {
+        SERIAL_PORT_NONE = 0,
+        SERIAL_PORT_OPEN = 1,
+        SERIAL_PORT_CLOSE = 2,
+    };
+    Q_ENUM(SERIAL_PORT_STATE)
 
 private slots:
     void handleOpenButtonClicked();
     void handleCloseButtonClicked();
     void updateLog(const QString &data);
+    void optionStateChanged(int oState);
 
 private:
     void createComboBoxLayout(QVBoxLayout *parentLayout, const QString &labelText, QComboBox *&comboBox, const QStringList &items, const QString &defaultItem = "");
     void populateAvailablePorts();
-    void logClear();
+    void allClear();
 
 private:
     UartManager *uartManager;

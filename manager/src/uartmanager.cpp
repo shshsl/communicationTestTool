@@ -29,16 +29,17 @@ void UartManager::openSerialPort(const QString &portName, int baudRate,
     
     qDebug() << "set port options..." << portName;
 
-    // if (serialPort->open(QIODevice::ReadWrite))
-    // {
-    //     emit portOpened();
-    //     qDebug() << "Opened port:" << portName;
-    // }
-    // else
-    // {
-    //     qDebug() << "Failed to open port:" << portName;
-    //     qDebug() << "Error:" << serialPort->errorString();
-    // }
+    if (serialPort->open(QIODevice::ReadWrite))
+    {
+        emit portOpened(SERIAL_PORT_STATE::SERIAL_PORT_OPEN);
+        qDebug() << "Opened port:" << portName;
+    }
+    else
+    {
+        emit portFailedToOpen(SERIAL_PORT_STATE::SERIAL_PORT_NONE);
+        qDebug() << "Failed to open port:" << portName;
+        qDebug() << "Error:" << serialPort->errorString();
+    }
 }
 
 void UartManager::closeSerialPort()
@@ -46,7 +47,7 @@ void UartManager::closeSerialPort()
     if (serialPort->isOpen())
     {
         serialPort->close();
-        emit portClosed();
+        emit portClosed(SERIAL_PORT_STATE::SERIAL_PORT_NONE);
         qDebug() << "Closed port.";
     }
 }
