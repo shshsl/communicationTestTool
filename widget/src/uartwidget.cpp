@@ -29,51 +29,6 @@
 //     }
 // }
 
-
-// void UartWidget::openSerialPort()
-// {
-//     QString selectedPortName = portSelector->currentText();  // 사용자가 선택한 포트 이름 가져오기
-//     QString selectedBaudRate = baudrateSelector->currentText();  // 사용자가 선택한 Baudrate 가져오기
-//     QString selectedDataBits = dataBitsSelector->currentText();
-//     QString selectedParity = paritySelector->currentText();
-//     QString selectedStopBits = stopBitsSelector->currentText();
-//     QString selectedFlowControl = flowControlSelector->currentText();
-
-//     serialPort->setPortName(selectedPortName);  // 선택한 포트를 설정
-//     serialPort->setBaudRate(selectedBaudRate.toInt());  // 선택한 Baudrate 설정
-
-//     // Data Bits 설정
-//     if (selectedDataBits == "5") serialPort->setDataBits(QSerialPort::Data5);
-//     else if (selectedDataBits == "6") serialPort->setDataBits(QSerialPort::Data6);
-//     else if (selectedDataBits == "7") serialPort->setDataBits(QSerialPort::Data7);
-//     else serialPort->setDataBits(QSerialPort::Data8);
-
-//     // Parity 설정
-//     if (selectedParity == "No Parity") serialPort->setParity(QSerialPort::NoParity);
-//     else if (selectedParity == "Even Parity") serialPort->setParity(QSerialPort::EvenParity);
-//     else if (selectedParity == "Odd Parity") serialPort->setParity(QSerialPort::OddParity);
-//     else if (selectedParity == "Space Parity") serialPort->setParity(QSerialPort::SpaceParity);
-//     else serialPort->setParity(QSerialPort::MarkParity);
-
-//     // Stop Bits 설정
-//     if (selectedStopBits == "1") serialPort->setStopBits(QSerialPort::OneStop);
-//     else if (selectedStopBits == "1.5") serialPort->setStopBits(QSerialPort::OneAndHalfStop);
-//     else serialPort->setStopBits(QSerialPort::TwoStop);
-
-//     // Flow Control 설정
-//     if (selectedFlowControl == "No Flow Control") serialPort->setFlowControl(QSerialPort::NoFlowControl);
-//     else if (selectedFlowControl == "Hardware Control") serialPort->setFlowControl(QSerialPort::HardwareControl);
-//     else serialPort->setFlowControl(QSerialPort::SoftwareControl);
-
-//     // test...
-//     // 비동기 작업 실행
-
-//     m_selectedPort = selectedPortName;
-//     m_selectedBaudRate = selectedBaudRate;
-
-//     showProgressDialog();
-
-
 // //    // port 가능 여부 판단. ---
 // //    if (serialPort->open(QIODevice::ReadOnly))
 // //    {
@@ -181,11 +136,15 @@ UartWidget::UartWidget(QWidget *parent)
    // frame->setFrameShape(QFrame::Box);  // 사각형 테두리
    // frame->setFrameShadow(QFrame::Plain);  // 단순한 테두리 스타일
    // frame->setLineWidth(2);  // 테두리 두께 설정
-   // mainLayout->addWidget(frame);
+   // gLayout->addWidget(frame);
 
    logView = new QListView(this);
    logView->setModel(logModel);
    gLayout->addWidget(logView, 0, 0);
+   
+   dataView = new QListView(this);
+   dataView->setModel(dataModel);
+   gLayout->addWidget(dataView, 1, 0);
     
    // [ Options ]
    auto *optionGroupBox = new QGroupBox();
@@ -224,7 +183,7 @@ UartWidget::UartWidget(QWidget *parent)
    auto *buttonLayout = new QHBoxLayout();
    buttonLayout->addWidget(openButton);
    buttonLayout->addWidget(closeButton);
-   gLayout->addLayout(buttonLayout, 1, 0);
+   optionGroupLayout->addLayout(buttonLayout);
 
    // Clear 버튼 추가
    clearBtn = new QPushButton("Clear", this);

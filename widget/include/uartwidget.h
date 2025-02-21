@@ -117,6 +117,9 @@ private:
     QListView *logView;
     QStandardItemModel *logModel;
     
+    QListView *dataView;
+    QStandardItemModel *dataModel;
+    
     QSerialPort *serialPort;                    // UART 포트 객체
     QPushButton *openButton;               // Open 버튼
     QPushButton *closeButton;               // Close 버튼
