@@ -104,12 +104,13 @@ private slots:
     void handleOpenButtonClicked();
     void handleCloseButtonClicked();
     void updateLog(const QString &data);
-    void optionStateChanged(int oState);
+    void handlePortStateChanged(int state);
 
 private:
     void createComboBoxLayout(QVBoxLayout *parentLayout, const QString &labelText, QComboBox *&comboBox, const QStringList &items, const QString &defaultItem = "");
     void populateAvailablePorts();
     void allClear();
+    void optionStateChanged(int oState);
 
 private:
     UartManager *uartManager;

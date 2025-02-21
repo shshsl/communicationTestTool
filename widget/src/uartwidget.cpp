@@ -199,8 +199,9 @@ UartWidget::UartWidget(QWidget *parent)
    connect(closeButton, &QPushButton::clicked, this, &UartWidget::handleCloseButtonClicked);
    connect(clearBtn, &QPushButton::clicked, this, &UartWidget::allClear);
    // manager
-   connect(uartManager, &UartManager::portOpened, this, &UartWidget::optionStateChanged);
-   connect(uartManager, &UartManager::portClosed, this, &UartWidget::optionStateChanged);
+   connect(uartManager, &UartManager::portOpened, this, &UartWidget::handlePortStateChanged);
+   connect(uartManager, &UartManager::portClosed, this, &UartWidget::handlePortStateChanged);
+   connect(uartManager, &UartManager::portFailedToOpen, this, &UartWidget::handlePortStateChanged);
 
    optionGroupBox->setLayout(optionGroupLayout);
    populateAvailablePorts();
@@ -308,6 +309,33 @@ void UartWidget::allClear()
    logModel->clear();
    //  optionStateChanged(SERIAL_PORT_STATE::SERIAL_PORT_NONE);
 }
+
+void UartWidget::handlePortStateChanged(int state)
+{
+    QString logMessage;
+
+    switch (state)
+    {
+    case SERIAL_PORT_STATE::SERIAL_PORT_OPEN:
+        logMessage = "Serial port opened successfully.";
+        break;
+    case SERIAL_PORT_STATE::SERIAL_PORT_CLOSE:
+        logMessage = "Serial port closed.";
+        break;
+    case SERIAL_PORT_STATE::SERIAL_PORT_NONE:
+        logMessage = "Failed to open serial port.";
+        break;
+    default:
+        logMessage = "Unknown serial port state.";
+        break;
+    }
+    
+    optionStateChanged(state);
+
+    // Append the message to the log model
+    logModel->appendRow(new QStandardItem(logMessage));
+}
+
 
 void UartWidget::optionStateChanged(int oState)
 {

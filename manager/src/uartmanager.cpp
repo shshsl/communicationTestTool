@@ -47,7 +47,7 @@ void UartManager::closeSerialPort()
     if (serialPort->isOpen())
     {
         serialPort->close();
-        emit portClosed(SERIAL_PORT_STATE::SERIAL_PORT_NONE);
+        emit portClosed(SERIAL_PORT_STATE::SERIAL_PORT_CLOSE);
         qDebug() << "Closed port.";
     }
 }
