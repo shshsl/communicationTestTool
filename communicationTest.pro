@@ -13,21 +13,17 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-#widget
                   widget/src/testapp.cpp \
                   widget/src/uartwidget.cpp \
                   widget/src/socketwidget.cpp \
-#mgr
                   manager/src/workerthread.cpp \
                   manager/src/socketmanager.cpp \
                   manager/src/uartmanager.cpp \
 
 HEADERS  += \
-#widget
                    widget/include/testapp.h \
                    widget/include/uartwidget.h \
                    widget/include/socketwidget.h \
-#mgr
                    manager/include/workerthread.h \
                    manager/include/socketmanager.h \
                    manager/include/uartmanager.h \

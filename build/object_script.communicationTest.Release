@@ -1,0 +1,16 @@
+INPUT(
+./release\main.o
+./release\testapp.o
+./release\uartwidget.o
+./release\socketwidget.o
+./release\workerthread.o
+./release\socketmanager.o
+./release\uartmanager.o
+./release\qrc_qml.o
+./release\moc_testapp.o
+./release\moc_uartwidget.o
+./release\moc_socketwidget.o
+./release\moc_workerthread.o
+./release\moc_socketmanager.o
+./release\moc_uartmanager.o
+);

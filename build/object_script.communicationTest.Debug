@@ -1,0 +1,16 @@
+INPUT(
+./debug\main.o
+./debug\testapp.o
+./debug\uartwidget.o
+./debug\socketwidget.o
+./debug\workerthread.o
+./debug\socketmanager.o
+./debug\uartmanager.o
+./debug\qrc_qml.o
+./debug\moc_testapp.o
+./debug\moc_uartwidget.o
+./debug\moc_socketwidget.o
+./debug\moc_workerthread.o
+./debug\moc_socketmanager.o
+./debug\moc_uartmanager.o
+);
