@@ -22,6 +22,7 @@ class UartWidget : public QWidget
 
 public:
     explicit UartWidget(QWidget *parent = nullptr);
+    ~UartWidget();
     
     enum SERIAL_PORT_STATE
     {
@@ -42,6 +43,7 @@ private:
     void createDataInputLayout(QGridLayout *parentLayout, QLineEdit *&lineEdit, const int row = 0);
     void populateAvailablePorts();
     void allClear();
+    void dataClear();
     void optionStateChanged(int oState);
     
     // QString asciiToHex(const QString &ascii);
@@ -54,6 +56,8 @@ private:
     QStandardItemModel *logModel;
     QListView *dataView;
     QStandardItemModel *dataModel;
+    QListView *sendDataView;
+    QStandardItemModel *sendDataModel;
     
     QSerialPort *serialPort;
     QPushButton *openButton;
@@ -79,7 +83,6 @@ private:
     QVector<QPushButton *> sendButtons;
     QVector<QPushButton *> toggleButtons;
     
-    bool isHexMode;
     int m_nLayoutRow = 0;
     int m_nLayoutColumn = 0;
 };

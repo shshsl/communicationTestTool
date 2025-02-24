@@ -1,53 +1,3 @@
-// //// 비동기 UI 업데이트.
-// void UartWidget::showProgressDialog() {
-//     // QProgressDialog 생성
-//     QProgressDialog* progress = new QProgressDialog("포트를 여는 중입니다...", "취소", 0, 0, this);
-//     progress->setWindowModality(Qt::WindowModal);
-//     progress->setCancelButton(nullptr); // 취소 버튼 숨김
-//     progress->show();
-
-//     // Worker 스레드 생성
-//     QThread* workThread = new QThread(this);
-//     serialPort->moveToThread(workThread);
-
-//     connect(workThread, &QThread::started, [=]() {
-//         bool success = serialPort->open(QIODevice::ReadOnly);
-
-//         emit threadFinished(success); // 결과 전달
-//         workThread->quit();
-//     });
-
-//     connect(workThread, &QThread::finished, this, [=]() {
-//         progress->close();
-
-//         if (serialPort->isOpen())
-//         {
-//             connect(serialPort, &QSerialPort::readyRead, this, &UartWidget::readSerialData);
-
-//             logModel->appendRow(new QStandardItem("> Opened port: [ " + m_selectedPort + " ] at [ " + m_selectedBaudRate + " ] baud"));
-//             qDebug() << "Opened port:" << m_selectedPort << "at" << m_selectedBaudRate << "baud";
-
-//             optionStateChanged(SERIAL_PORT_STATE::SERIAL_PORT_CLOSE);   // toggle
-//         }
-//         else
-//         {
-//             QMessageBox::critical(this, "실패", "포트를 열 수 없습니다.");
-
-//             logModel->appendRow(new QStandardItem("** !.!. Failed to open port: [ " + m_selectedPort + " ]"));
-//             qDebug() << "Failed to open port:" << serialPort->errorString();
-
-//             optionStateChanged(SERIAL_PORT_STATE::SERIAL_PORT_OPEN);    // toggle
-//         }
-
-//         workThread->deleteLater();
-// //        serialPort->deleteLater();    // serialport는 closebutton 때만 제거.
-//         progress->deleteLater();
-//     });
-
-//     workThread->start();
-// }
-
-/////////
 #include "widget/include/uartwidget.h"
 
 UartWidget::UartWidget(QWidget *parent)
@@ -56,7 +6,7 @@ UartWidget::UartWidget(QWidget *parent)
 {
    // UI 구성
    auto *gLayout = new QGridLayout(this);
-   setLayout(gLayout);
+   // setLayout(gLayout);
    
    // // QFrame 생성 및 설정 - layout 위치 확인용 test.
    // QFrame *frame = new QFrame;
@@ -67,38 +17,31 @@ UartWidget::UartWidget(QWidget *parent)
 
    logView = new QListView(this);
    logView->setModel(logModel);
-   gLayout->addWidget(logView, 0, 0);
+   gLayout->addWidget(logView, m_nLayoutRow, 0);
        
    // [ Options ]
    auto *optionGroupBox = new QGroupBox();
    auto *optionGroupLayout = new QVBoxLayout();
    gLayout->addWidget(optionGroupBox, 0, 1);
 
-   // 포트 선택 ComboBox
    createComboBoxLayout(optionGroupLayout, "Device : ", portSelector, {});
 
-   // Baudrate 선택 ComboBox
    createComboBoxLayout(optionGroupLayout, "Baudrate : ", baudrateSelector,
                      {"2400", "4800", "9600", "14400", "19200", "38400", "57600", "115200"}, "115200");
 
-   // DataBits 선택 ComboBox
    createComboBoxLayout(optionGroupLayout, "Data Bits : ", dataBitsSelector,
                      {"5", "6", "7", "8"}, "8");
 
-   // Parity 선택 ComboBox
    createComboBoxLayout(optionGroupLayout, "Parity : ", paritySelector,
                      {"No Parity", "Even Parity", "Odd Parity", "Space Parity", "Mark Parity"}, "No Parity");
 
-   // StopBits 선택 ComboBox
    createComboBoxLayout(optionGroupLayout, "Stop Bits : ", stopBitsSelector,
                      {"1", "1.5", "2"}, "1");
 
-   // FlowControl 선택 ComboBox
    createComboBoxLayout(optionGroupLayout, "Flow Control : ", flowControlSelector,
                      {"No Flow Control", "Hardware Control", "Software Control"}, "No Flow Control");
    
    // [ Button ]
-   // Open 및 Close 버튼 생성
    openButton = new QPushButton("Open", this);
    closeButton = new QPushButton("Close", this);
 
@@ -109,7 +52,7 @@ UartWidget::UartWidget(QWidget *parent)
 
    logClearButton = new QPushButton("Log Clear", this);
    logClearButton->setFixedSize(100, 25);
-   gLayout->addWidget(logClearButton, 1, 1);
+   gLayout->addWidget(logClearButton, m_nLayoutRow + 1, 1);
 
    // [ data send ]
    for(int i = 0 ; i < 8 ; i++) {
@@ -120,18 +63,26 @@ UartWidget::UartWidget(QWidget *parent)
    dataView->setModel(dataModel);
    gLayout->addWidget(dataView, m_nLayoutRow + 1, 0);
    
+   sendDataView = new QListView(this);
+   sendDataView->setModel(sendDataModel);
+   gLayout->addWidget(sendDataView, m_nLayoutRow + 1, 1);
+   
    dataClearButton = new QPushButton("Data Clear", this);
    dataClearButton->setFixedSize(100, 25);
    gLayout->addWidget(dataClearButton, m_nLayoutRow + 2, 1);
 
-   // 초기 상태: Close 버튼 비활성화
+   // init state: disable buttons.
    closeButton->setEnabled(false);
+   for (QPushButton *button : sendButtons) {
+      button->setEnabled(false);
+   }
 
    // coonect signal/slot
    // widget
    connect(openButton, &QPushButton::clicked, this, &UartWidget::handleOpenButtonClicked);
    connect(closeButton, &QPushButton::clicked, this, &UartWidget::handleCloseButtonClicked);
    connect(logClearButton, &QPushButton::clicked, this, &UartWidget::allClear);
+   connect(dataClearButton, &QPushButton::clicked, this, &UartWidget::dataClear);
    // manager
    connect(uartManager, &UartManager::portOpened, this, &UartWidget::handlePortStateChanged);
    connect(uartManager, &UartManager::portClosed, this, &UartWidget::handlePortStateChanged);
@@ -140,6 +91,16 @@ UartWidget::UartWidget(QWidget *parent)
    optionGroupBox->setLayout(optionGroupLayout);
    populateAvailablePorts();
 }
+
+UartWidget::~UartWidget()
+{
+   if (this->layout() != nullptr) {
+      delete this->layout();
+   }
+   delete uartManager;
+}
+
+
 
 // [option] ComboBox common layout
 void UartWidget::createComboBoxLayout(QVBoxLayout *parentLayout, const QString &labelText, QComboBox *&comboBox, const QStringList &items, const QString &defaultItem)
@@ -301,30 +262,35 @@ void UartWidget::allClear()
    //  optionStateChanged(SERIAL_PORT_STATE::SERIAL_PORT_NONE);
 }
 
+void UartWidget::dataClear()
+{
+   dataModel->clear();
+}
+
 void UartWidget::handlePortStateChanged(int state)
 {
-    QString logMessage;
+   QString logMessage;
 
-    switch (state)
-    {
-    case SERIAL_PORT_STATE::SERIAL_PORT_OPEN:
-        logMessage = "Serial port opened successfully.";
-        break;
-    case SERIAL_PORT_STATE::SERIAL_PORT_CLOSE:
-        logMessage = "Serial port closed.";
-        break;
-    case SERIAL_PORT_STATE::SERIAL_PORT_NONE:
-        logMessage = "Failed to open serial port.";
-        break;
-    default:
-        logMessage = "Unknown serial port state.";
-        break;
-    }
-    
-    optionStateChanged(state);
+   switch (state)
+   {
+   case SERIAL_PORT_STATE::SERIAL_PORT_OPEN:
+      logMessage = "Serial port opened successfully.";
+      break;
+   case SERIAL_PORT_STATE::SERIAL_PORT_CLOSE:
+      logMessage = "Serial port closed.";
+      break;
+   case SERIAL_PORT_STATE::SERIAL_PORT_NONE:
+      logMessage = "Failed to open serial port.";
+      break;
+   default:
+      logMessage = "Unknown serial port state.";
+      break;
+   }
+   
+   optionStateChanged(state);
 
-    // Append the message to the log model
-    logModel->appendRow(new QStandardItem(logMessage));
+   // Append the message to the log model
+   logModel->appendRow(new QStandardItem(logMessage));
 }
 
 
@@ -342,6 +308,9 @@ void UartWidget::optionStateChanged(int oState)
       paritySelector->setEnabled(false);
       stopBitsSelector->setEnabled(false);
       flowControlSelector->setEnabled(false);
+      for (QPushButton *button : sendButtons) {
+         button->setEnabled(true);
+      }
    }
    else
    {
@@ -353,7 +322,12 @@ void UartWidget::optionStateChanged(int oState)
       paritySelector->setEnabled(true);
       stopBitsSelector->setEnabled(true);
       flowControlSelector->setEnabled(true);
+      for (QPushButton *button : sendButtons) {
+         button->setEnabled(false);
+      }
    }
+   
+   // QCoreApplication::processEvents(); // UI 강제 갱신
 }
 
 // QString UartWidget::asciiToHex(const QString &ascii) {

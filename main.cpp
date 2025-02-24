@@ -27,27 +27,19 @@
 /// exec for cpp.
 ///
 #include <QApplication>
-#include "widget/include/uartwidget.h"
-
 #include <QTabWidget>
 #include <QLabel>
 #include <QVBoxLayout>
+
+#include "widget/include/uartwidget.h"
+#include "widget/include/socketwidget.h"
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     QTabWidget tabWidget;
 
-    // Uart Tab
     UartWidget *uartTab = new UartWidget;
-    QVBoxLayout *uartLayout = new QVBoxLayout;
-//    uartLayout->addWidget(new QLabel("This is [ UART ] Tab"));
-    uartTab->setLayout(uartLayout);
-
-    // Socket Tab
-    QWidget *socketTab = new QWidget;
-    QVBoxLayout *socketLayout = new QVBoxLayout;
-//    socketLayout->addWidget(new QLabel("This is [ SOCKET ] Tab"));
-    socketTab->setLayout(socketLayout);
+    SocketWidget *socketTab = new SocketWidget;
 
     tabWidget.addTab(uartTab, "UART");
     tabWidget.addTab(socketTab, "SOCKET");
