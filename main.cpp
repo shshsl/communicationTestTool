@@ -53,9 +53,18 @@ int main(int argc, char *argv[]) {
     
     // setting tab bar style.
     tabWidget.setStyleSheet(
-        "QTabBar::tab { background-color:rgb(24, 164, 235); }"
+        "QTabBar::tab {"
+        "   background-color:rgb(24, 164, 235);"
+        "   border: 2px solid white;"       // 기본 테두리 색상
+        "   border-radius: 4px;"          // 테두리 모서리를 둥글게
+        "   padding: 2px;"
+        "}"
         "QTabBar::tab:selected { background-color:rgb(16, 233, 233); }"
-        "QTabBar::tab:hover { background-color:rgb(230, 236, 134); }"
+        "QTabBar::tab:hover { "
+        "   background-color:rgb(53, 57, 107); "
+        "   color:rgb(255, 255, 255);"
+        "}"
+        "QTabBar::tab { width: 100px; }"
     );
     
     tabWidget.addTab(uartTab, "UART");
