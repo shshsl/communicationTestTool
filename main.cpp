@@ -29,17 +29,24 @@
 #include <QApplication>
 #include <QTabWidget>
 #include <QLabel>
-#include <QVBoxLayout>
+#include <QScreen>
 
 #include "widget/include/uartwidget.h"
 #include "widget/include/socketwidget.h"
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
+
     QTabWidget tabWidget;
 
     UartWidget *uartTab = new UartWidget;
     SocketWidget *socketTab = new SocketWidget;
+
+    // screen resolution.
+    QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
+
+    int screenWidth = screenGeometry.width();
+    int screenHeight = screenGeometry.height();
 
     // uartTab->setStyleSheet("background-color: red;");
     // socketTab->setStyleSheet("background-color: blue;");
@@ -53,8 +60,8 @@ int main(int argc, char *argv[]) {
     
     tabWidget.addTab(uartTab, "UART");
     tabWidget.addTab(socketTab, "SOCKET");
-    tabWidget.setMinimumSize(600, 700);
-    tabWidget.resize(800, 800);
+    tabWidget.setMinimumSize(screenWidth * 0.25, screenHeight * 0.4);
+    tabWidget.resize(screenWidth * 0.3, screenHeight * 0.5);
     tabWidget.show();
 
     return app.exec();
