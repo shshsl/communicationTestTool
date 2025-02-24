@@ -17,6 +17,7 @@ UartWidget::UartWidget(QWidget *parent)
 
    logView = new QListView(this);
    logView->setModel(logModel);
+   logView->setEditTriggers(QAbstractItemView::NoEditTriggers);   // disable editing
    gLayout->addWidget(logView, m_nLayoutRow, 0);
        
    // [ Options ]
@@ -63,16 +64,18 @@ UartWidget::UartWidget(QWidget *parent)
    sendDataView = new QTextEdit(this);   // TX 데이터 뷰
    sendDataViewLabel = new QLabel("▶️ Send Data :");
    sendDataView->setReadOnly(true);
+   sendDataView->setPlaceholderText("Send Data to Device...");
    dataView = new QTextEdit(this);       // RX 데이터 뷰
    dataViewLabel = new QLabel("▶️ Receive Data :");
    dataView->setReadOnly(true);
+   dataView->setPlaceholderText("Receive Data from Device...");
    sendDataViewLabel->setContentsMargins(0, 10, 0, 0);   //left, top, right, bottom
    dataViewLabel->setContentsMargins(0, 10, 0, 0);       //left, top, right, bottom
    
-   gLayout->addWidget(dataViewLabel, m_nLayoutRow + 1, 0);
-   gLayout->addWidget(dataView, m_nLayoutRow + 2, 0);
-   gLayout->addWidget(sendDataViewLabel, m_nLayoutRow + 1, 1);
-   gLayout->addWidget(sendDataView, m_nLayoutRow + 2, 1);
+   gLayout->addWidget(sendDataViewLabel, m_nLayoutRow + 1, 0);
+   gLayout->addWidget(sendDataView, m_nLayoutRow + 2, 0);
+   gLayout->addWidget(dataViewLabel, m_nLayoutRow + 1, 1);
+   gLayout->addWidget(dataView, m_nLayoutRow + 2, 1);
    m_nLayoutRow = m_nLayoutRow + 2;
    
    dataClearButton = new QPushButton("Data Clear", this);
@@ -97,6 +100,12 @@ UartWidget::UartWidget(QWidget *parent)
    connect(uartManager, &UartManager::dataReceived, this, [=](const QString &data) {   // RX 데이터 업데이트 (수신 Signal 연결)
       updateDataLog(data);
    });
+   // connect(logModel, &QStandardItemModel::rowsInserted, this, [=](const QModelIndex &parent, int first, int last) {  // find listview index.
+   //    for (int row = first; row <= last; ++row) {
+   //        QModelIndex index = logModel->index(row, 0, parent); // 첫 번째 열 기준
+   //        qDebug() << "New item added at Row:" << row << "Column:" << index.column();
+   //    }
+   // });
    // manager
    connect(uartManager, &UartManager::portOpened, this, &UartWidget::handlePortStateChanged);
    connect(uartManager, &UartManager::portClosed, this, &UartWidget::handlePortStateChanged);
@@ -291,7 +300,8 @@ void UartWidget::allClear()
 
 void UartWidget::dataClear()
 {
-//   dataModel->clear();
+   sendDataView->clear();
+   dataView->clear();
 }
 
 void UartWidget::handlePortStateChanged(int state)

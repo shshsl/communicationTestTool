@@ -41,6 +41,16 @@ int main(int argc, char *argv[]) {
     UartWidget *uartTab = new UartWidget;
     SocketWidget *socketTab = new SocketWidget;
 
+    // uartTab->setStyleSheet("background-color: red;");
+    // socketTab->setStyleSheet("background-color: blue;");
+    
+    // setting tab bar style.
+    tabWidget.setStyleSheet(
+        "QTabBar::tab { background-color:rgb(24, 164, 235); }"
+        "QTabBar::tab:selected { background-color:rgb(16, 233, 233); }"
+        "QTabBar::tab:hover { background-color:rgb(230, 236, 134); }"
+    );
+    
     tabWidget.addTab(uartTab, "UART");
     tabWidget.addTab(socketTab, "SOCKET");
     tabWidget.setMinimumSize(600, 600);
