@@ -69,13 +69,9 @@ UartWidget::UartWidget(QWidget *parent)
    logView->setModel(logModel);
    gLayout->addWidget(logView, 0, 0);
    
-   controlView = new QListView(this);
-   controlView->setModel(controlModel);
-   gLayout->addWidget(controlView, 2, 0);
-   
-   dataView = new QListView(this);
-   dataView->setModel(dataModel);
-   gLayout->addWidget(dataView, 3, 0);
+   // dataView = new QListView(this);
+   // dataView->setModel(dataModel);
+   // gLayout->addWidget(dataView, 3, 0);
     
    // [ Options ]
    auto *optionGroupBox = new QGroupBox();
@@ -126,19 +122,11 @@ UartWidget::UartWidget(QWidget *parent)
    gLayout->addWidget(dataClearButton, 3, 1);
 
    // [ data send ]
-   // (QVBoxLayout *parentLayout, const QString &labelText, QLineEdit *&lineEdit)
-   createDataInputLayout(gLayout, "Data : ", dataInput);
-   // dataInput = new QLineEdit(this); // 텍스트 입력 창
-   // sendButton = new QPushButton("Send", this); // 데이터 전송 버튼
-   // toggleButton = new QPushButton("ASCII/HEX", this); // ASCII/HEX 토글 버튼
+   for(int i = 0 ; i < 8 ; i++) {
+      createDataInputLayout(gLayout, "Data : ", dataInput, i);
+   }
+   // createDataInputLayout(gLayout, "Data : ", dataInput, row);
 
-   // auto *inputLayout = new QHBoxLayout();
-   // inputLayout->addWidget(dataInput);
-   // inputLayout->addWidget(toggleButton);
-   // inputLayout->addWidget(sendButton);
-
-   // 기존 gLayout에 추가 (적절한 위치에 배치)
-   // gLayout->addLayout(inputLayout, 4, 0, 1, 2); // 행 4번에 배치
 
    // 초기 상태: Close 버튼 비활성화
    closeButton->setEnabled(false);
@@ -184,7 +172,7 @@ void UartWidget::createComboBoxLayout(QVBoxLayout *parentLayout, const QString &
    parentLayout->addLayout(boxLayout);
 }
 
-void UartWidget::createDataInputLayout(QGridLayout *parentLayout, const QString &labelText, QLineEdit *&lineEdit)
+void UartWidget::createDataInputLayout(QGridLayout *parentLayout, const QString &labelText, QLineEdit *&lineEdit, const int row)
 {
    QHBoxLayout *boxLayout = new QHBoxLayout();
    QLabel *label = new QLabel(labelText);
@@ -195,7 +183,7 @@ void UartWidget::createDataInputLayout(QGridLayout *parentLayout, const QString 
    boxLayout->addWidget(lineEdit);
    boxLayout->addWidget(toggleButton);
    boxLayout->addWidget(sendButton);
-   parentLayout->addLayout(boxLayout, 4, 0, 1, 2);
+   parentLayout->addLayout(boxLayout, row + 2, 0, 1, 2);
 }
 
 void UartWidget::populateAvailablePorts()

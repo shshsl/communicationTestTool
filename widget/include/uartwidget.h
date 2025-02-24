@@ -39,7 +39,7 @@ private slots:
 
 private:
     void createComboBoxLayout(QVBoxLayout *parentLayout, const QString &labelText, QComboBox *&comboBox, const QStringList &items, const QString &defaultItem = "");
-    void createDataInputLayout(QGridLayout *parentLayout, const QString &labelText, QLineEdit *&lineEdit);
+    void createDataInputLayout(QGridLayout *parentLayout, const QString &labelText, QLineEdit *&lineEdit, const int row);
     void populateAvailablePorts();
     void allClear();
     void optionStateChanged(int oState);
@@ -52,20 +52,18 @@ private:
     
     QListView *logView;
     QStandardItemModel *logModel;
-    QListView *controlView;
-    QStandardItemModel *controlModel;
     QListView *dataView;
     QStandardItemModel *dataModel;
     
-    QSerialPort *serialPort;                    // UART 포트 객체
-    QPushButton *openButton;               // Open 버튼
-    QPushButton *closeButton;               // Close 버튼
+    QSerialPort *serialPort;
+    QPushButton *openButton;
+    QPushButton *closeButton;
     QPushButton *logClearButton;
     QPushButton *dataClearButton;
 
-    QComboBox *portSelector;               // 포트 선택 ComboBox
-    QComboBox *baudrateSelector;        // Baudrate 선택 ComboBox
-    QComboBox *dataBitsSelector;         // DataBits 선택 ComboBox
+    QComboBox *portSelector;
+    QComboBox *baudrateSelector;
+    QComboBox *dataBitsSelector;
     QComboBox *paritySelector;
     QComboBox *stopBitsSelector;
     QComboBox *flowControlSelector;
