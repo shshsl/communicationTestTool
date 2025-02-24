@@ -63,6 +63,14 @@ void UartManager::readSerialData()
     }
 }
 
+void UartManager::writeSerialData(const QString &data)
+{
+    if (serialPort->isOpen()) {
+        serialPort->write(data.toUtf8());
+        qDebug() << "Transmitted:" << data;
+    }
+}
+
 QStringList UartManager::getAvailablePorts() const
 {
     QStringList ports;

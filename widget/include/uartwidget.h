@@ -13,6 +13,7 @@
 #include <QDebug>
 #include <QLabel>
 #include <QLineEdit>
+#include <QTextedit>
 
 #include "manager/include/uartmanager.h"
 
@@ -35,8 +36,12 @@ public:
 private slots:
     void handleOpenButtonClicked();
     void handleCloseButtonClicked();
-    void updateLog(const QString &data);
+    void updateDataLog(const QString &data);
+    void updateSendDataLog(const QString &data);
     void handlePortStateChanged(int state);
+    
+signals:
+    void sendData(const QString &data);
 
 private:
     void createComboBoxLayout(QVBoxLayout *parentLayout, const QString &labelText, QComboBox *&comboBox, const QStringList &items, const QString &defaultItem = "");
@@ -54,10 +59,8 @@ private:
     
     QListView *logView;
     QStandardItemModel *logModel;
-    QListView *dataView;
-    QStandardItemModel *dataModel;
-    QListView *sendDataView;
-    QStandardItemModel *sendDataModel;
+    QTextEdit *dataView;
+    QTextEdit *sendDataView;
     
     QSerialPort *serialPort;
     QPushButton *openButton;
@@ -72,6 +75,8 @@ private:
     QComboBox *stopBitsSelector;
     QComboBox *flowControlSelector;
 
+    QLabel *dataViewLabel;
+    QLabel *sendDataViewLabel;
     QLabel *portLabel;
     QLabel *baudLabel;
     QLabel *dataBitsLabel;

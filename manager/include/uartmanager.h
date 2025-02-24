@@ -35,6 +35,7 @@ signals:
 
 private slots:
     void readSerialData();
+    void writeSerialData(const QString &data);
 
 private:
     QSerialPort *serialPort;

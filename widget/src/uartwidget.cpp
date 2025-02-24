@@ -52,24 +52,32 @@ UartWidget::UartWidget(QWidget *parent)
 
    logClearButton = new QPushButton("Log Clear", this);
    logClearButton->setFixedSize(100, 25);
-   gLayout->addWidget(logClearButton, m_nLayoutRow + 1, 1);
+   gLayout->addWidget(logClearButton, m_nLayoutRow + 1, 1, Qt::AlignRight);
 
    // [ data send ]
    for(int i = 0 ; i < 8 ; i++) {
       createDataInputLayout(gLayout, dataInput, i);
+      // m_nLayoutRow + 2 + i
    }
-      
-   dataView = new QListView(this);
-   dataView->setModel(dataModel);
-   gLayout->addWidget(dataView, m_nLayoutRow + 1, 0);
+
+   sendDataView = new QTextEdit(this);   // TX 데이터 뷰
+   sendDataViewLabel = new QLabel("▶️ Send Data :");
+   sendDataView->setReadOnly(true);
+   dataView = new QTextEdit(this);       // RX 데이터 뷰
+   dataViewLabel = new QLabel("▶️ Receive Data :");
+   dataView->setReadOnly(true);
+   sendDataViewLabel->setContentsMargins(0, 10, 0, 0);   //left, top, right, bottom
+   dataViewLabel->setContentsMargins(0, 10, 0, 0);       //left, top, right, bottom
    
-   sendDataView = new QListView(this);
-   sendDataView->setModel(sendDataModel);
-   gLayout->addWidget(sendDataView, m_nLayoutRow + 1, 1);
+   gLayout->addWidget(dataViewLabel, m_nLayoutRow + 1, 0);
+   gLayout->addWidget(dataView, m_nLayoutRow + 2, 0);
+   gLayout->addWidget(sendDataViewLabel, m_nLayoutRow + 1, 1);
+   gLayout->addWidget(sendDataView, m_nLayoutRow + 2, 1);
+   m_nLayoutRow = m_nLayoutRow + 2;
    
    dataClearButton = new QPushButton("Data Clear", this);
    dataClearButton->setFixedSize(100, 25);
-   gLayout->addWidget(dataClearButton, m_nLayoutRow + 2, 1);
+   gLayout->addWidget(dataClearButton, m_nLayoutRow + 1, 1, Qt::AlignRight);
 
    // init state: disable buttons.
    closeButton->setEnabled(false);
@@ -83,6 +91,12 @@ UartWidget::UartWidget(QWidget *parent)
    connect(closeButton, &QPushButton::clicked, this, &UartWidget::handleCloseButtonClicked);
    connect(logClearButton, &QPushButton::clicked, this, &UartWidget::allClear);
    connect(dataClearButton, &QPushButton::clicked, this, &UartWidget::dataClear);
+   connect(this, &UartWidget::sendData, this, [=](const QString &data) {   // TX 데이터 업데이트
+      updateSendDataLog(data);
+   });
+   connect(uartManager, &UartManager::dataReceived, this, [=](const QString &data) {   // RX 데이터 업데이트 (수신 Signal 연결)
+      updateDataLog(data);
+   });
    // manager
    connect(uartManager, &UartManager::portOpened, this, &UartWidget::handlePortStateChanged);
    connect(uartManager, &UartManager::portClosed, this, &UartWidget::handlePortStateChanged);
@@ -94,13 +108,21 @@ UartWidget::UartWidget(QWidget *parent)
 
 UartWidget::~UartWidget()
 {
+   // widget
+   disconnect(openButton, &QPushButton::clicked, this, &UartWidget::handleOpenButtonClicked);
+   disconnect(closeButton, &QPushButton::clicked, this, &UartWidget::handleCloseButtonClicked);
+   disconnect(logClearButton, &QPushButton::clicked, this, &UartWidget::allClear);
+   disconnect(dataClearButton, &QPushButton::clicked, this, &UartWidget::dataClear);
+   // manager
+   disconnect(uartManager, &UartManager::portOpened, this, &UartWidget::handlePortStateChanged);
+   disconnect(uartManager, &UartManager::portClosed, this, &UartWidget::handlePortStateChanged);
+   disconnect(uartManager, &UartManager::portFailedToOpen, this, &UartWidget::handlePortStateChanged);
+   
    if (this->layout() != nullptr) {
       delete this->layout();
    }
    delete uartManager;
 }
-
-
 
 // [option] ComboBox common layout
 void UartWidget::createComboBoxLayout(QVBoxLayout *parentLayout, const QString &labelText, QComboBox *&comboBox, const QStringList &items, const QString &defaultItem)
@@ -251,9 +273,14 @@ void UartWidget::handleCloseButtonClicked()
    // logModel->appendRow(new QStandardItem("Closed port."));
 }
 
-void UartWidget::updateLog(const QString &data)
+void UartWidget::updateDataLog(const QString &data)
 {
-   dataModel->appendRow(new QStandardItem(data));
+   // dataModel->appendRow(new QStandardItem(data));
+}
+
+void UartWidget::updateSendDataLog(const QString &data)
+{
+   // sendDataModel->appendRow(new QStandardItem(data));
 }
 
 void UartWidget::allClear()
@@ -264,7 +291,7 @@ void UartWidget::allClear()
 
 void UartWidget::dataClear()
 {
-   dataModel->clear();
+//   dataModel->clear();
 }
 
 void UartWidget::handlePortStateChanged(int state)
