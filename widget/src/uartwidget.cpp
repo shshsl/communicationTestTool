@@ -1,72 +1,3 @@
-// void UartWidget::readSerialData()
-// {
-//     while (serialPort->canReadLine())
-//     {
-//         // 줄 단위로 데이터 읽기
-//         QByteArray data = serialPort->readLine();
-//         QString logEntry = QString::fromUtf8(data).trimmed();
-
-//         // QListView에 새로운 로그 추가
-//         logModel->appendRow(new QStandardItem(logEntry));
-
-//         // 로그가 많아지면 자동 스크롤
-//         auto *mainLayout = qobject_cast<QGridLayout *>(layout());
-//         if (mainLayout)
-//         {
-//             // 0행 0열에 위치한 QListView 가져오기
-//             auto *item = mainLayout->itemAtPosition(0, 0);
-//             if (item)
-//             {
-//                 auto *listView = qobject_cast<QListView *>(item->widget());
-//                 if (listView)
-//                 {
-//                     listView->scrollToBottom();
-//                 }
-//             }
-//         }
-
-//         qDebug() << "Received:" << logEntry; // 디버그 출력
-//     }
-// }
-
-// //    // port 가능 여부 판단. ---
-// //    if (serialPort->open(QIODevice::ReadOnly))
-// //    {
-// //        connect(serialPort, &QSerialPort::readyRead, this, &MainWindow::readSerialData);
-
-// //        logModel->appendRow(new QStandardItem("> Opened port: [ " + selectedPortName + " ] at [ " + selectedBaudRate + " ] baud"));
-// //        qDebug() << "Opened port:" << selectedPortName << "at" << selectedBaudRate << "baud";
-
-// //        optionStateChanged(SERIAL_PORT_STATE::SERIAL_PORT_CLOSE);   //toggle
-// //    }
-// //    else
-// //    {
-// //        serialPort->close();
-// //        logModel->appendRow(new QStandardItem("** !.!. Failed to open port: [ " + selectedPortName + " ]"));
-// //        qDebug() << "Failed to open port:" << serialPort->errorString();
-
-// //        optionStateChanged(SERIAL_PORT_STATE::SERIAL_PORT_OPEN);    //toggle
-// //    }
-// }
-
-// void UartWidget::closeSerialPort()
-// {
-//     if (serialPort->isOpen())
-//     {
-//         disconnect(serialPort, &QSerialPort::readyRead, this, &UartWidget::readSerialData);
-//         serialPort->close();
-//         logModel->appendRow(new QStandardItem("+++++=++++++++++++++++++++++++++"));
-//         logModel->appendRow(new QStandardItem("■ Closed port."));
-//         logModel->appendRow(new QStandardItem("+++++=++++++++++++++++++++++++++"));
-//         qDebug() << "Closed port.";
-
-//         optionStateChanged(SERIAL_PORT_STATE::SERIAL_PORT_OPEN);
-
-//         populateAvailablePorts();  // 사용 가능한 포트를 다시 검색
-//     }
-// //    optionStateChanged(m_nClose);
-// }
-
 // //// 비동기 UI 업데이트.
 // void UartWidget::showProgressDialog() {
 //     // QProgressDialog 생성
@@ -116,12 +47,9 @@
 //     workThread->start();
 // }
 
-
-
-
-/////////////////////////===================================================================
-
+/////////
 #include "widget/include/uartwidget.h"
+#include <QLineEdit>
 
 UartWidget::UartWidget(QWidget *parent)
    : QWidget(parent), uartManager(new UartManager(this)),
@@ -144,7 +72,7 @@ UartWidget::UartWidget(QWidget *parent)
    
    dataView = new QListView(this);
    dataView->setModel(dataModel);
-   gLayout->addWidget(dataView, 1, 0);
+   gLayout->addWidget(dataView, 2, 0);
     
    // [ Options ]
    auto *optionGroupBox = new QGroupBox();
@@ -152,10 +80,10 @@ UartWidget::UartWidget(QWidget *parent)
    gLayout->addWidget(optionGroupBox, 0, 1);
 
    // 포트 선택 ComboBox
-   createComboBoxLayout(optionGroupLayout, "COM port : ", portSelector, {});
+   createComboBoxLayout(optionGroupLayout, "Device : ", portSelector, {});
 
    // Baudrate 선택 ComboBox
-   createComboBoxLayout(optionGroupLayout, "Baud Rate : ", baudrateSelector,
+   createComboBoxLayout(optionGroupLayout, "Baudrate : ", baudrateSelector,
                      {"2400", "4800", "9600", "14400", "19200", "38400", "57600", "115200"}, "115200");
 
    // DataBits 선택 ComboBox
@@ -193,7 +121,7 @@ UartWidget::UartWidget(QWidget *parent)
    // 초기 상태: Close 버튼 비활성화
    closeButton->setEnabled(false);
 
-   // 시그널/슬롯 연결
+   // coonect signal/slot
    // widget
    connect(openButton, &QPushButton::clicked, this, &UartWidget::handleOpenButtonClicked);
    connect(closeButton, &QPushButton::clicked, this, &UartWidget::handleCloseButtonClicked);
@@ -207,12 +135,20 @@ UartWidget::UartWidget(QWidget *parent)
    populateAvailablePorts();
 }
 
-// [option] 공통적인 ComboBox 레이아웃 생성 함수
+// [option] ComboBox common layout
 void UartWidget::createComboBoxLayout(QVBoxLayout *parentLayout, const QString &labelText, QComboBox *&comboBox, const QStringList &items, const QString &defaultItem)
 {
    QHBoxLayout *boxLayout = new QHBoxLayout();
    QLabel *label = new QLabel(labelText);
    comboBox = new QComboBox();
+   comboBox->setEditable(true);
+   comboBox->setInsertPolicy(QComboBox::NoInsert); // Prevent adding new items automatically
+   
+   // // Optional: Customize line edit if needed   
+   // //(if option is empty, it will be shown as a placeholder text)
+   // QLineEdit *lineEdit = comboBox->lineEdit();
+   // lineEdit->setPlaceholderText("Type or select an option");
+   
    comboBox->addItems(items);
    if (!defaultItem.isEmpty()) {
        comboBox->setCurrentText(defaultItem);
@@ -301,7 +237,7 @@ void UartWidget::handleCloseButtonClicked()
 
 void UartWidget::updateLog(const QString &data)
 {
-   logModel->appendRow(new QStandardItem(data));
+   dataModel->appendRow(new QStandardItem(data));
 }
 
 void UartWidget::allClear()
