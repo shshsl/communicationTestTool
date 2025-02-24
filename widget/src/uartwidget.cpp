@@ -184,7 +184,7 @@ void UartWidget::createDataInputLayout(QGridLayout *parentLayout, QLineEdit *&li
    toggleButton->setText("ASCII");
    toggleButton->setStyleSheet("color: blue;");
    toggleButton->setCheckable(true); // Make it toggleable
-   toggleButton->setStyleSheet("background-color: lightgray; border-radius: 5px;");
+//   toggleButton->setStyleSheet("background-color: lightgray; border-radius: 5px;");
    connect(toggleButton, &QPushButton::toggled, this, [=](bool checked) {
       toggleButton->setText(checked ? "HEX" : "ASCII");
       qDebug() << "Toggle button clicked for row" << row + 1 << "state:" << (checked ? "HEX" : "ASCII");
