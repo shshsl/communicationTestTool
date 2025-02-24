@@ -34,6 +34,8 @@
 #include "widget/include/uartwidget.h"
 #include "widget/include/socketwidget.h"
 
+#include <QWidget>
+
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 
@@ -41,6 +43,7 @@ int main(int argc, char *argv[]) {
 
     UartWidget *uartTab = new UartWidget;
     SocketWidget *socketTab = new SocketWidget;
+    QWidget *testWidget = new QWidget;
 
     // screen resolution.
     QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
@@ -69,6 +72,7 @@ int main(int argc, char *argv[]) {
     
     tabWidget.addTab(uartTab, "UART");
     tabWidget.addTab(socketTab, "SOCKET");
+    tabWidget.addTab(testWidget, "TEST");//test
     tabWidget.setMinimumSize(screenWidth * 0.25, screenHeight * 0.4);
     tabWidget.resize(screenWidth * 0.3, screenHeight * 0.5);
     tabWidget.show();
