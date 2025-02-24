@@ -170,13 +170,13 @@ void UartWidget::createDataInputLayout(QGridLayout *parentLayout, QLineEdit *&li
    QPushButton *sendButton = new QPushButton(this);
    sendButtons.append(sendButton); // Store in container
    sendButton->setText("Send");
-   // sendButton->setIcon(QIcon(":/icons/send.png")); // Add an icon (replace with your icon path)
-   // sendButton->setStyleSheet("background-color: lightblue; border-radius: 5px;"); // Styling
-   // connect(sendButton, &QPushButton::clicked, this, [=]() {
-   //    QString data = lineEdit->text();
-   //    qDebug() << "Send button clicked for row" << row + 1 << "with data:" << data;
-   //    uartManager->writeSerialData(data);
-   // });
+   sendButton->setIcon(QIcon(":/icons/send.png")); // Add an icon (replace with your icon path)
+   sendButton->setStyleSheet("background-color: lightblue; border-radius: 5px;"); // Styling
+   connect(sendButton, &QPushButton::clicked, this, [=]() {
+      QString data = lineEdit->text();
+      qDebug() << "Send button clicked for row" << row + 1 << "with data:" << data;
+      uartManager->writeSerialData(data);
+   });
    
    // Create and customize toggle QPushButton
    QPushButton *toggleButton = new QPushButton(this);
@@ -184,14 +184,15 @@ void UartWidget::createDataInputLayout(QGridLayout *parentLayout, QLineEdit *&li
    toggleButton->setText("ASCII");
    toggleButton->setStyleSheet("color: blue;");
    toggleButton->setCheckable(true); // Make it toggleable
-   // toggleButton->setStyleSheet("background-color: lightgray; border-radius: 5px;");
-   // connect(toggleButton, &QPushButton::toggled, this, [=](bool checked) {
-   //    toggleButton->setText(checked ? "HEX" : "ASCII");
-   //    qDebug() << "Toggle button clicked for row" << row + 1 << "state:" << (checked ? "HEX" : "ASCII");
-   //    toggleButtons[row]->setStyleSheet(checked ? "color: green;" : "color: blue;");
-   //    // toggleButtons[row]->setStyleSheet(checked ? "background-color: lightgreen;" : "background-color: lightgray;");
-   // });
+   toggleButton->setStyleSheet("background-color: lightgray; border-radius: 5px;");
+   connect(toggleButton, &QPushButton::toggled, this, [=](bool checked) {
+      toggleButton->setText(checked ? "HEX" : "ASCII");
+      qDebug() << "Toggle button clicked for row" << row + 1 << "state:" << (checked ? "HEX" : "ASCII");
+      toggleButtons[row]->setStyleSheet(checked ? "color: green;" : "color: blue;");
+      // toggleButtons[row]->setStyleSheet(checked ? "background-color: lightgreen;" : "background-color: lightgray;");
+   });
    
+   /*
    connect(toggleButton, &QPushButton::toggled, this, [=](bool checked) {
       QString currentText = lineEdit->text();
 
@@ -239,6 +240,7 @@ void UartWidget::createDataInputLayout(QGridLayout *parentLayout, QLineEdit *&li
           qDebug() << "Send button clicked for row" << row + 1 << "(ASCII):" << data;
       }
    });
+   */
    
    boxLayout->addWidget(label);
    boxLayout->addWidget(lineEdit);
