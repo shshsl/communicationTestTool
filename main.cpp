@@ -51,6 +51,7 @@ int main(int argc, char *argv[]) {
 
     tabWidget.addTab(uartTab, "UART");
     tabWidget.addTab(socketTab, "SOCKET");
+    tabWidget.setMinimumSize(600, 600);
     tabWidget.resize(800, 800);
     tabWidget.show();
 
