@@ -14,6 +14,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QTextedit>
+#include <QDateTime>
 
 #include "manager/include/uartmanager.h"
 
@@ -36,8 +37,8 @@ public:
 private slots:
     void handleOpenButtonClicked();
     void handleCloseButtonClicked();
-    void updateDataLog(const QString &data);
-    void updateSendDataLog(const QString &data);
+    void updateReceivedData(const QString &data);
+    void updateSendData(const QString &data);
     void handlePortStateChanged(int state);
     
 signals:

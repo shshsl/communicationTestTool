@@ -26,16 +26,17 @@ public:
                         QSerialPort::FlowControl flowControl);
     void closeSerialPort();
     QStringList getAvailablePorts() const;
+    void writeSerialData(const QString &data);
 
 signals:
     void dataReceived(const QString &data);
+    void dataSend(const QString &data);
     void portClosed(int state);
     void portOpened(int state);
     void portFailedToOpen(int state);
 
 private slots:
     void readSerialData();
-    void writeSerialData(const QString &data);
 
 private:
     QSerialPort *serialPort;

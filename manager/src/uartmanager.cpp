@@ -67,6 +67,7 @@ void UartManager::writeSerialData(const QString &data)
 {
     if (serialPort->isOpen()) {
         serialPort->write(data.toUtf8());
+        emit dataSend(data); // 데이터 전송 후 신호발생.
         qDebug() << "Transmitted:" << data;
     }
 }

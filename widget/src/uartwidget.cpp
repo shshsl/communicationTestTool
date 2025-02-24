@@ -94,12 +94,6 @@ UartWidget::UartWidget(QWidget *parent)
    connect(closeButton, &QPushButton::clicked, this, &UartWidget::handleCloseButtonClicked);
    connect(logClearButton, &QPushButton::clicked, this, &UartWidget::allClear);
    connect(dataClearButton, &QPushButton::clicked, this, &UartWidget::dataClear);
-   connect(this, &UartWidget::sendData, this, [=](const QString &data) {   // TX 데이터 업데이트
-      updateSendDataLog(data);
-   });
-   connect(uartManager, &UartManager::dataReceived, this, [=](const QString &data) {   // RX 데이터 업데이트 (수신 Signal 연결)
-      updateDataLog(data);
-   });
    // connect(logModel, &QStandardItemModel::rowsInserted, this, [=](const QModelIndex &parent, int first, int last) {  // find listview index.
    //    for (int row = first; row <= last; ++row) {
    //        QModelIndex index = logModel->index(row, 0, parent); // 첫 번째 열 기준
@@ -107,6 +101,8 @@ UartWidget::UartWidget(QWidget *parent)
    //    }
    // });
    // manager
+   connect(uartManager, &UartManager::dataReceived, this, &UartWidget::updateReceivedData);
+   connect(uartManager, &UartManager::dataSend, this, &UartWidget::updateSendData);
    connect(uartManager, &UartManager::portOpened, this, &UartWidget::handlePortStateChanged);
    connect(uartManager, &UartManager::portClosed, this, &UartWidget::handlePortStateChanged);
    connect(uartManager, &UartManager::portFailedToOpen, this, &UartWidget::handlePortStateChanged);
@@ -179,7 +175,7 @@ void UartWidget::createDataInputLayout(QGridLayout *parentLayout, QLineEdit *&li
    connect(sendButton, &QPushButton::clicked, this, [=]() {
       QString data = lineEdit->text();
       qDebug() << "Send button clicked for row" << row + 1 << "with data:" << data;
-      // Add specific functionality for each button here
+      uartManager->writeSerialData(data);
   });
    
    // Create and customize toggle QPushButton
@@ -282,14 +278,24 @@ void UartWidget::handleCloseButtonClicked()
    // logModel->appendRow(new QStandardItem("Closed port."));
 }
 
-void UartWidget::updateDataLog(const QString &data)
+void UartWidget::updateReceivedData(const QString &data)
 {
-   // dataModel->appendRow(new QStandardItem(data));
+   // TX data
+   // qDebug() << "*********** updateReceivedData:" << data;//test log
+   if (dataView) {
+      QString timestamp = QDateTime::currentDateTime().toString("yy/MM/dd HH:mm:ss");
+      dataView->append(QString("[%1] %2").arg(timestamp).arg(data));
+   }
 }
 
-void UartWidget::updateSendDataLog(const QString &data)
+void UartWidget::updateSendData(const QString &data)
 {
-   // sendDataModel->appendRow(new QStandardItem(data));
+   // RX data
+   // qDebug() << "*********** updateSendData:" << data;//test log
+   if (dataView) {
+      QString timestamp = QDateTime::currentDateTime().toString("yy/MM/dd HH:mm:ss");
+      sendDataView->append(QString("[%1] %2").arg(timestamp).arg(data));
+   }
 }
 
 void UartWidget::allClear()
