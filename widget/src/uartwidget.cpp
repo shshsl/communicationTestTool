@@ -68,11 +68,7 @@ UartWidget::UartWidget(QWidget *parent)
    logView = new QListView(this);
    logView->setModel(logModel);
    gLayout->addWidget(logView, 0, 0);
-   
-   // dataView = new QListView(this);
-   // dataView->setModel(dataModel);
-   // gLayout->addWidget(dataView, 3, 0);
-    
+       
    // [ Options ]
    auto *optionGroupBox = new QGroupBox();
    auto *optionGroupLayout = new QVBoxLayout();
@@ -106,27 +102,27 @@ UartWidget::UartWidget(QWidget *parent)
    openButton = new QPushButton("Open", this);
    closeButton = new QPushButton("Close", this);
 
-   // 버튼을 포함한 하단 레이아웃 생성
    auto *buttonLayout = new QHBoxLayout();
    buttonLayout->addWidget(openButton);
    buttonLayout->addWidget(closeButton);
    optionGroupLayout->addLayout(buttonLayout);
 
-   // Clear 버튼 추가
    logClearButton = new QPushButton("Log Clear", this);
    logClearButton->setFixedSize(100, 25);
    gLayout->addWidget(logClearButton, 1, 1);
-   
-   dataClearButton = new QPushButton("Data Clear", this);
-   dataClearButton->setFixedSize(100, 25);
-   gLayout->addWidget(dataClearButton, 3, 1);
 
    // [ data send ]
    for(int i = 0 ; i < 8 ; i++) {
-      createDataInputLayout(gLayout, "Data : ", dataInput, i);
+      createDataInputLayout(gLayout, dataInput, i);
    }
-   // createDataInputLayout(gLayout, "Data : ", dataInput, row);
-
+      
+   dataView = new QListView(this);
+   dataView->setModel(dataModel);
+   gLayout->addWidget(dataView, m_nLayoutRow + 1, 0);
+   
+   dataClearButton = new QPushButton("Data Clear", this);
+   dataClearButton->setFixedSize(100, 25);
+   gLayout->addWidget(dataClearButton, m_nLayoutRow + 2, 1);
 
    // 초기 상태: Close 버튼 비활성화
    closeButton->setEnabled(false);
@@ -172,18 +168,49 @@ void UartWidget::createComboBoxLayout(QVBoxLayout *parentLayout, const QString &
    parentLayout->addLayout(boxLayout);
 }
 
-void UartWidget::createDataInputLayout(QGridLayout *parentLayout, const QString &labelText, QLineEdit *&lineEdit, const int row)
+void UartWidget::createDataInputLayout(QGridLayout *parentLayout, QLineEdit *&lineEdit, const int row)
 {
    QHBoxLayout *boxLayout = new QHBoxLayout();
-   QLabel *label = new QLabel(labelText);
+   // Create and customize QLabel
+   QLabel *label = new QLabel(QString("Data (%1): ").arg(row), this);
    lineEdit = new QLineEdit();
-   sendButton = new QPushButton("Send", this); // 데이터 전송 버튼
-   toggleButton = new QPushButton("ASCII/HEX", this); // ASCII/HEX 토글 버튼
+   lineEdit->setPlaceholderText("Enter data here...");
+   lineEdit->setClearButtonEnabled(true); // Adds a clear button inside the line edit
+   lineEdit->setValidator(new QRegExpValidator(QRegExp("[0-9A-Fa-f ]*"), this)); // Example: HEX input only
+   
+   // Create and customize send QPushButton
+   QPushButton *sendButton = new QPushButton(this);
+   sendButtons.append(sendButton); // Store in container
+   sendButton->setText("Send");
+   // sendButton->setIcon(QIcon(":/icons/send.png")); // Add an icon (replace with your icon path)
+   // sendButton->setStyleSheet("background-color: lightblue; border-radius: 5px;"); // Styling
+   connect(sendButton, &QPushButton::clicked, this, [=]() {
+      QString data = lineEdit->text();
+      qDebug() << "Send button clicked for row" << row + 1 << "with data:" << data;
+      // Add specific functionality for each button here
+  });
+   
+   // Create and customize toggle QPushButton
+   QPushButton *toggleButton = new QPushButton(this);
+   toggleButtons.append(toggleButton); // Store in container
+   toggleButton->setText("ASCII");
+   toggleButton->setStyleSheet("color: blue;");
+   toggleButton->setCheckable(true); // Make it toggleable
+   // toggleButton->setStyleSheet("background-color: lightgray; border-radius: 5px;");
+   connect(toggleButton, &QPushButton::toggled, this, [=](bool checked) {
+      toggleButton->setText(checked ? "HEX" : "ASCII");
+      qDebug() << "Toggle button clicked for row" << row + 1 << "state:" << (checked ? "HEX" : "ASCII");
+      toggleButtons[row]->setStyleSheet(checked ? "color: green;" : "color: blue;");
+      // toggleButtons[row]->setStyleSheet(checked ? "background-color: lightgreen;" : "background-color: lightgray;");
+  });
+   
    boxLayout->addWidget(label);
    boxLayout->addWidget(lineEdit);
    boxLayout->addWidget(toggleButton);
    boxLayout->addWidget(sendButton);
    parentLayout->addLayout(boxLayout, row + 2, 0, 1, 2);
+   
+   m_nLayoutRow = row + 2;
 }
 
 void UartWidget::populateAvailablePorts()

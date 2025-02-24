@@ -39,7 +39,7 @@ private slots:
 
 private:
     void createComboBoxLayout(QVBoxLayout *parentLayout, const QString &labelText, QComboBox *&comboBox, const QStringList &items, const QString &defaultItem = "");
-    void createDataInputLayout(QGridLayout *parentLayout, const QString &labelText, QLineEdit *&lineEdit, const int row);
+    void createDataInputLayout(QGridLayout *parentLayout, QLineEdit *&lineEdit, const int row = 0);
     void populateAvailablePorts();
     void allClear();
     void optionStateChanged(int oState);
@@ -76,10 +76,12 @@ private:
     QLabel *flowLabel;
     
     QLineEdit *dataInput;
-    QPushButton *sendButton;
-    QPushButton *toggleButton;
+    QVector<QPushButton *> sendButtons;
+    QVector<QPushButton *> toggleButtons;
     
     bool isHexMode;
+    int m_nLayoutRow = 0;
+    int m_nLayoutColumn = 0;
 };
 
 #endif // UARTWIDGET_H
