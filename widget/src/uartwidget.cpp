@@ -49,7 +49,7 @@
 
 /////////
 #include "widget/include/uartwidget.h"
-#include <QLineEdit>
+// #include <QLineEdit>
 
 UartWidget::UartWidget(QWidget *parent)
    : QWidget(parent), uartManager(new UartManager(this)),
@@ -148,8 +148,12 @@ void UartWidget::createComboBoxLayout(QVBoxLayout *parentLayout, const QString &
 {
    QHBoxLayout *boxLayout = new QHBoxLayout();
    QLabel *label = new QLabel(labelText);
+   bool isEditable = false;
+   if(comboBox == portSelector || comboBox == baudrateSelector) {
+       isEditable = true;
+   }
    comboBox = new QComboBox();
-   comboBox->setEditable(true);
+   comboBox->setEditable(isEditable);
    comboBox->setInsertPolicy(QComboBox::NoInsert); // Prevent adding new items automatically
    
    // // Optional: Customize line edit if needed   
@@ -240,7 +244,7 @@ void UartWidget::handleOpenButtonClicked()
 void UartWidget::handleCloseButtonClicked()
 {
    uartManager->closeSerialPort();
-   logModel->appendRow(new QStandardItem("Closed port."));
+   // logModel->appendRow(new QStandardItem("Closed port."));
 }
 
 void UartWidget::updateLog(const QString &data)
