@@ -164,7 +164,7 @@ void UartWidget::createDataInputLayout(QGridLayout *parentLayout, QLineEdit *&li
    lineEdit = new QLineEdit();
    lineEdit->setPlaceholderText("Enter data here...");
    lineEdit->setClearButtonEnabled(true); // Adds a clear button inside the line edit
-   lineEdit->setValidator(new QRegExpValidator(QRegExp("[0-9A-Fa-f ]*"), this)); // Example: HEX input only
+   // lineEdit->setValidator(new QRegExpValidator(QRegExp("[0-9A-Fa-f ]*"), this)); // Example: HEX input only
    
    // Create and customize send QPushButton
    QPushButton *sendButton = new QPushButton(this);
@@ -172,11 +172,11 @@ void UartWidget::createDataInputLayout(QGridLayout *parentLayout, QLineEdit *&li
    sendButton->setText("Send");
    // sendButton->setIcon(QIcon(":/icons/send.png")); // Add an icon (replace with your icon path)
    // sendButton->setStyleSheet("background-color: lightblue; border-radius: 5px;"); // Styling
-   connect(sendButton, &QPushButton::clicked, this, [=]() {
-      QString data = lineEdit->text();
-      qDebug() << "Send button clicked for row" << row + 1 << "with data:" << data;
-      uartManager->writeSerialData(data);
-  });
+   // connect(sendButton, &QPushButton::clicked, this, [=]() {
+   //    QString data = lineEdit->text();
+   //    qDebug() << "Send button clicked for row" << row + 1 << "with data:" << data;
+   //    uartManager->writeSerialData(data);
+   // });
    
    // Create and customize toggle QPushButton
    QPushButton *toggleButton = new QPushButton(this);
@@ -185,12 +185,60 @@ void UartWidget::createDataInputLayout(QGridLayout *parentLayout, QLineEdit *&li
    toggleButton->setStyleSheet("color: blue;");
    toggleButton->setCheckable(true); // Make it toggleable
    // toggleButton->setStyleSheet("background-color: lightgray; border-radius: 5px;");
+   // connect(toggleButton, &QPushButton::toggled, this, [=](bool checked) {
+   //    toggleButton->setText(checked ? "HEX" : "ASCII");
+   //    qDebug() << "Toggle button clicked for row" << row + 1 << "state:" << (checked ? "HEX" : "ASCII");
+   //    toggleButtons[row]->setStyleSheet(checked ? "color: green;" : "color: blue;");
+   //    // toggleButtons[row]->setStyleSheet(checked ? "background-color: lightgreen;" : "background-color: lightgray;");
+   // });
+   
    connect(toggleButton, &QPushButton::toggled, this, [=](bool checked) {
-      toggleButton->setText(checked ? "HEX" : "ASCII");
+      QString currentText = lineEdit->text();
+
+      if (checked)
+      {
+          QByteArray asciiData = currentText.toUtf8();
+          QString hexData = asciiData.toHex().toUpper();
+          // 구분자를 추가하는 로직
+          QString formattedHexData;
+          for (int i = 0; i < hexData.length(); i += 2) {
+             formattedHexData.append(hexData.mid(i, 2)); // 두 글자씩 가져옴
+             if (i + 2 < hexData.length()) {
+                formattedHexData.append(' '); // 각 바이트 사이에 공백 추가
+             }
+          }
+          hexData = formattedHexData;
+          lineEdit->setText(hexData);
+          toggleButton->setText("HEX");
+      }
+      else
+      {
+          QByteArray hexData = QByteArray::fromHex(currentText.remove(' ').toUtf8());
+          QString asciiData = QString::fromUtf8(hexData);
+          lineEdit->setText(asciiData);
+          toggleButton->setText("ASCII");
+      }
+
       qDebug() << "Toggle button clicked for row" << row + 1 << "state:" << (checked ? "HEX" : "ASCII");
       toggleButtons[row]->setStyleSheet(checked ? "color: green;" : "color: blue;");
-      // toggleButtons[row]->setStyleSheet(checked ? "background-color: lightgreen;" : "background-color: lightgray;");
-  });
+   });
+
+   connect(sendButton, &QPushButton::clicked, this, [=]() {
+      QString data = lineEdit->text();
+      bool isHexMode = toggleButton->isChecked();
+
+      if (isHexMode)
+      {
+          QByteArray hexData = QByteArray::fromHex(data.remove(' ').toUtf8());
+          uartManager->writeSerialData(QString(hexData));
+          qDebug() << "Send button clicked for row" << row + 1 << "(HEX):" << hexData.toHex().toUpper();
+      }
+      else
+      {
+          uartManager->writeSerialData(data);
+          qDebug() << "Send button clicked for row" << row + 1 << "(ASCII):" << data;
+      }
+   });
    
    boxLayout->addWidget(label);
    boxLayout->addWidget(lineEdit);
