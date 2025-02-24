@@ -70,9 +70,13 @@ UartWidget::UartWidget(QWidget *parent)
    logView->setModel(logModel);
    gLayout->addWidget(logView, 0, 0);
    
+   controlView = new QListView(this);
+   controlView->setModel(controlModel);
+   gLayout->addWidget(controlView, 2, 0);
+   
    dataView = new QListView(this);
    dataView->setModel(dataModel);
-   gLayout->addWidget(dataView, 2, 0);
+   gLayout->addWidget(dataView, 3, 0);
     
    // [ Options ]
    auto *optionGroupBox = new QGroupBox();
@@ -114,9 +118,13 @@ UartWidget::UartWidget(QWidget *parent)
    optionGroupLayout->addLayout(buttonLayout);
 
    // Clear 버튼 추가
-   clearBtn = new QPushButton("Clear", this);
-   clearBtn->setFixedSize(100, 25);
-   gLayout->addWidget(clearBtn, 1, 1);
+   logClearButton = new QPushButton("Log Clear", this);
+   logClearButton->setFixedSize(100, 25);
+   gLayout->addWidget(logClearButton, 1, 1);
+   
+   dataClearButton = new QPushButton("Data Clear", this);
+   dataClearButton->setFixedSize(100, 25);
+   gLayout->addWidget(dataClearButton, 3, 1);
 
    // 초기 상태: Close 버튼 비활성화
    closeButton->setEnabled(false);
@@ -125,7 +133,7 @@ UartWidget::UartWidget(QWidget *parent)
    // widget
    connect(openButton, &QPushButton::clicked, this, &UartWidget::handleOpenButtonClicked);
    connect(closeButton, &QPushButton::clicked, this, &UartWidget::handleCloseButtonClicked);
-   connect(clearBtn, &QPushButton::clicked, this, &UartWidget::allClear);
+   connect(logClearButton, &QPushButton::clicked, this, &UartWidget::allClear);
    // manager
    connect(uartManager, &UartManager::portOpened, this, &UartWidget::handlePortStateChanged);
    connect(uartManager, &UartManager::portClosed, this, &UartWidget::handlePortStateChanged);

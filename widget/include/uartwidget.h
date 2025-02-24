@@ -117,14 +117,16 @@ private:
     
     QListView *logView;
     QStandardItemModel *logModel;
-    
+    QListView *controlView;
+    QStandardItemModel *controlModel;
     QListView *dataView;
     QStandardItemModel *dataModel;
     
     QSerialPort *serialPort;                    // UART 포트 객체
     QPushButton *openButton;               // Open 버튼
     QPushButton *closeButton;               // Close 버튼
-    QPushButton *clearBtn;
+    QPushButton *logClearButton;
+    QPushButton *dataClearButton;
 
     QComboBox *portSelector;               // 포트 선택 ComboBox
     QComboBox *baudrateSelector;        // Baudrate 선택 ComboBox
