@@ -49,7 +49,6 @@
 
 /////////
 #include "widget/include/uartwidget.h"
-// #include <QLineEdit>
 
 UartWidget::UartWidget(QWidget *parent)
    : QWidget(parent), uartManager(new UartManager(this)),
@@ -126,6 +125,21 @@ UartWidget::UartWidget(QWidget *parent)
    dataClearButton->setFixedSize(100, 25);
    gLayout->addWidget(dataClearButton, 3, 1);
 
+   // [ data send ]
+   // (QVBoxLayout *parentLayout, const QString &labelText, QLineEdit *&lineEdit)
+   createDataInputLayout(gLayout, "Data : ", dataInput);
+   // dataInput = new QLineEdit(this); // 텍스트 입력 창
+   // sendButton = new QPushButton("Send", this); // 데이터 전송 버튼
+   // toggleButton = new QPushButton("ASCII/HEX", this); // ASCII/HEX 토글 버튼
+
+   // auto *inputLayout = new QHBoxLayout();
+   // inputLayout->addWidget(dataInput);
+   // inputLayout->addWidget(toggleButton);
+   // inputLayout->addWidget(sendButton);
+
+   // 기존 gLayout에 추가 (적절한 위치에 배치)
+   // gLayout->addLayout(inputLayout, 4, 0, 1, 2); // 행 4번에 배치
+
    // 초기 상태: Close 버튼 비활성화
    closeButton->setEnabled(false);
 
@@ -168,6 +182,20 @@ void UartWidget::createComboBoxLayout(QVBoxLayout *parentLayout, const QString &
    boxLayout->addWidget(label);
    boxLayout->addWidget(comboBox);
    parentLayout->addLayout(boxLayout);
+}
+
+void UartWidget::createDataInputLayout(QGridLayout *parentLayout, const QString &labelText, QLineEdit *&lineEdit)
+{
+   QHBoxLayout *boxLayout = new QHBoxLayout();
+   QLabel *label = new QLabel(labelText);
+   lineEdit = new QLineEdit();
+   sendButton = new QPushButton("Send", this); // 데이터 전송 버튼
+   toggleButton = new QPushButton("ASCII/HEX", this); // ASCII/HEX 토글 버튼
+   boxLayout->addWidget(label);
+   boxLayout->addWidget(lineEdit);
+   boxLayout->addWidget(toggleButton);
+   boxLayout->addWidget(sendButton);
+   parentLayout->addLayout(boxLayout, 4, 0, 1, 2);
 }
 
 void UartWidget::populateAvailablePorts()
@@ -291,10 +319,10 @@ void UartWidget::optionStateChanged(int oState)
    
    if (oState == SERIAL_PORT_STATE::SERIAL_PORT_OPEN)
    {
-      openButton->setEnabled(false);   // Open 버튼 활성화
-      closeButton->setEnabled(true);  // Close 버튼 비활성화
-      portSelector->setEnabled(false);  // 포트 선택 활성화
-      baudrateSelector->setEnabled(false);  // Baudrate 선택 활성화
+      openButton->setEnabled(false);
+      closeButton->setEnabled(true);
+      portSelector->setEnabled(false);
+      baudrateSelector->setEnabled(false);
       dataBitsSelector->setEnabled(false);
       paritySelector->setEnabled(false);
       stopBitsSelector->setEnabled(false);
@@ -302,13 +330,22 @@ void UartWidget::optionStateChanged(int oState)
    }
    else
    {
-      openButton->setEnabled(true);   // Open 버튼 활성화
-      closeButton->setEnabled(false);  // Close 버튼 비활성화
-      portSelector->setEnabled(true);  // 포트 선택 활성화
-      baudrateSelector->setEnabled(true);  // Baudrate 선택 활성화
+      openButton->setEnabled(true);
+      closeButton->setEnabled(false);
+      portSelector->setEnabled(true);
+      baudrateSelector->setEnabled(true);
       dataBitsSelector->setEnabled(true);
       paritySelector->setEnabled(true);
       stopBitsSelector->setEnabled(true);
       flowControlSelector->setEnabled(true);
    }
 }
+
+// QString UartWidget::asciiToHex(const QString &ascii) {
+//    return QString::fromLatin1(ascii.toLatin1().toHex(' ').toUpper()); // HEX 변환
+// }
+
+// QString UartWidget::hexToAscii(const QString &hex) {
+//    QByteArray byteArray = QByteArray::fromHex(hex.toLatin1());
+//    return QString::fromLatin1(byteArray); // ASCII 변환
+// }
