@@ -81,3 +81,69 @@ QStringList UartManager::getAvailablePorts() const
     
     return ports;
 }
+
+//// *** >> example. << ***
+//// *** >> need a specific protocol.
+QByteArray UartManager::createPacket(const QByteArray &payload)
+{
+   if (payload.size() > 64) {
+       qDebug() << "Payload size exceeds maximum limit!";
+       return QByteArray();
+   }
+
+    // make packet.
+    // header + payload size + payload + checksum
+    QByteArray packet;
+    packet.append(0xAA); // header
+    packet.append(static_cast<char>(payload.size()));
+    packet.append(payload);
+
+    char checksum = 0;
+    for (char byte : payload) {
+        checksum ^= byte;   // XOR
+    }
+    packet.append(checksum);
+
+    return packet;
+}
+
+void UartManager::sendPacket(const QByteArray &payload)
+{
+    QByteArray packet = createPacket(payload);
+    if (!packet.isEmpty())
+    {
+        serialPort->write(packet);
+        qDebug() << "Packet sent:" << packet.toHex();
+    }
+}
+
+void UartManager::receiveData()
+{
+    QByteArray data = serialPort->readAll();
+
+    // ex) simple packet process
+    if (data.startsWith(0xAA))  // check header
+    {
+        int length = static_cast<unsigned char>(data[1]);
+        QByteArray payload = data.mid(2, length); // 페이로드 추출
+
+        char checksum = 0;
+        for (char byte : payload) {
+            checksum ^= byte;
+        }
+
+        if (checksum == data[2 + length])   // certificate checksum
+        {
+            qDebug() << "Valid packet received:" << payload;
+        }
+        else
+        {
+            qDebug() << "Checksum error!";
+        }
+    }
+    else
+    {
+        qDebug() << "header error!";
+    }
+}
+

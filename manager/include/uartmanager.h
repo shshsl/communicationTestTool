@@ -39,6 +39,11 @@ private slots:
     void readSerialData();
 
 private:
+QByteArray createPacket(const QByteArray &payload);
+    void sendPacket(const QByteArray &payload);
+    void receiveData();
+
+private:
     QSerialPort *serialPort;
 };
 

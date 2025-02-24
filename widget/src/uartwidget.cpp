@@ -162,6 +162,7 @@ void UartWidget::createDataInputLayout(QGridLayout *parentLayout, QLineEdit *&li
    // Create and customize QLabel
    QLabel *label = new QLabel(QString("Data (%1): ").arg(row), this);
    lineEdit = new QLineEdit();
+   lineEdit->setMaxLength(64); // 최대 입력 길이 제한 (64바이트)
    lineEdit->setPlaceholderText("Enter data here...");
    lineEdit->setClearButtonEnabled(true); // Adds a clear button inside the line edit
    // lineEdit->setValidator(new QRegExpValidator(QRegExp("[0-9A-Fa-f ]*"), this)); // Example: HEX input only
