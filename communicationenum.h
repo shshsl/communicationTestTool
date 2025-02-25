@@ -6,7 +6,7 @@
 
 namespace Communication
 {
-    class UartEnums
+    class Uart
     {
         Q_GADGET // Q_GADGET을 사용하여 메타 데이터 지원
         Q_ENUMS(SerialPortState) // Qt 5.6에서 Q_ENUMS로 enum 등록
@@ -19,13 +19,23 @@ namespace Communication
             SERIAL_PORT_CLOSE = 2,
         };
     };
+    
+    class Socket
+    {
+        Q_GADGET
+        Q_ENUMS(TestState)
+        
+    public:
+        enum TestState
+        {
+            TEST_NONE = 0,
+            TEST_OPEN = 1,
+            TEST_CLOSE = 2,
+        };
+    };
 }
 // 열거형을 QVariant로 사용하려면 Q_DECLARE_METATYPE 필요
-Q_DECLARE_METATYPE(Communication::UartEnums::SerialPortState)
-
-namespace SocketCommunication
-{
-
-}
+Q_DECLARE_METATYPE(Communication::Uart::SerialPortState)
+Q_DECLARE_METATYPE(Communication::Socket::TestState)
 
 #endif // COMMUNICATIONENUM_H
