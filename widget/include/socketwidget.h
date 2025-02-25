@@ -9,6 +9,7 @@
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QLabel>
+#include <QFontMetrics>
 
 #include "manager/include/socketmanager.h"
 
@@ -48,6 +49,8 @@ private:
     void createConnectionButton(QGridLayout *parentLayout, const QString &labelText, QPushButton *&pushButton);
     void createSetMessageLayout(QGridLayout *parentLayout, const QString &labelText, QLineEdit *&lineEdit);
     void createSetSendLayout(QGridLayout *parentLayout, const QString &labelText, QPushButton *&pushButton);
+    
+    int calculateMaxCharacters(QLineEdit *lineEdit, bool isNum = false);
     
 private:
     QPushButton *connectButton;

@@ -75,16 +75,23 @@ void SocketWidget::createSetConnectLayout(QGridLayout *parentLayout)
 {
     // 24.2.25 :: 현재 사용하면 프로그램 터짐. - 수정필요.
     // ip, port, protocol
+    // 172.30.1.43
     QHBoxLayout *boxLayout = new QHBoxLayout();
     QLabel *ipLabel = new QLabel("Address: ", this);
     QLineEdit *ipEdit = new QLineEdit();
     QLabel *portLabel = new QLabel("Port: ", this);
     QLineEdit *portEdit = new QLineEdit();
     
-    boxLayout->addWidget(ipLabel);
-    boxLayout->addWidget(ipEdit);
-    boxLayout->addWidget(portLabel);
-    boxLayout->addWidget(portEdit);
+    portLabel->setContentsMargins(10, 0, 0, 0);       //left, top, right, bottom
+    ipEdit->setFixedWidth(130);
+    portEdit->setFixedWidth(60);
+    ipEdit->setMaxLength(calculateMaxCharacters(ipEdit));
+    portEdit->setMaxLength(calculateMaxCharacters(portEdit));
+    
+    boxLayout->addWidget(ipLabel, Qt::AlignLeft);
+    boxLayout->addWidget(ipEdit, Qt::AlignLeft);
+    boxLayout->addWidget(portLabel, Qt::AlignLeft);
+    boxLayout->addWidget(portEdit, Qt::AlignLeft);
     
     parentLayout->addLayout(boxLayout, m_nLayoutRow, 0);
 }
@@ -138,5 +145,14 @@ void SocketWidget::onMessageReceived(QString message)
 void SocketWidget::onMessageSend(QString message)
 {
     messageView->append("Sent: " + message);
+}
+
+int SocketWidget::calculateMaxCharacters(QLineEdit *lineEdit, bool isNum)
+{
+    QFontMetrics fm(lineEdit->font());
+    int width = lineEdit->width();
+    // char c = isNum ? '2' : 'M';
+    char c = 'M';
+    return width / fm.boundingRect(c).width(); // char 'X' width
 }
 
