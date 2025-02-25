@@ -22,6 +22,7 @@ UartWidget::UartWidget(QWidget *parent)
        
    // [ Options ]
    auto *optionGroupBox = new QGroupBox();
+   optionGroupBox->setTitle("[ Setting Options ]");
    auto *optionGroupLayout = new QVBoxLayout();
    gLayout->addWidget(optionGroupBox, 0, 1);
 
@@ -140,13 +141,7 @@ void UartWidget::createComboBoxLayout(QVBoxLayout *parentLayout, const QString &
    }
    comboBox = new QComboBox();
    comboBox->setEditable(isEditable);
-   comboBox->setInsertPolicy(QComboBox::NoInsert); // Prevent adding new items automatically
-   
-   // // Optional: Customize line edit if needed   
-   // //(if option is empty, it will be shown as a placeholder text)
-   // QLineEdit *lineEdit = comboBox->lineEdit();
-   // lineEdit->setPlaceholderText("Type or select an option");
-   
+   comboBox->setInsertPolicy(QComboBox::NoInsert); // Prevent adding new items automatically   
    comboBox->addItems(items);
    if (!defaultItem.isEmpty()) {
        comboBox->setCurrentText(defaultItem);
@@ -190,58 +185,15 @@ void UartWidget::createDataInputLayout(QGridLayout *parentLayout, QLineEdit *&li
       toggleButton->setText(checked ? "HEX" : "ASCII");
       qDebug() << "Toggle button clicked for row" << row + 1 << "state:" << (checked ? "HEX" : "ASCII");
       toggleButtons[row]->setStyleSheet(checked ? "color: green;" : "color: blue;");
-      // toggleButtons[row]->setStyleSheet(checked ? "background-color: lightgreen;" : "background-color: lightgray;");
-   });
-   
-   /*
-   connect(toggleButton, &QPushButton::toggled, this, [=](bool checked) {
-      QString currentText = lineEdit->text();
-
       if (checked)
       {
-          QByteArray asciiData = currentText.toUtf8();
-          QString hexData = asciiData.toHex().toUpper();
-          // 구분자를 추가하는 로직
-          QString formattedHexData;
-          for (int i = 0; i < hexData.length(); i += 2) {
-             formattedHexData.append(hexData.mid(i, 2)); // 두 글자씩 가져옴
-             if (i + 2 < hexData.length()) {
-                formattedHexData.append(' '); // 각 바이트 사이에 공백 추가
-             }
-          }
-          hexData = formattedHexData;
-          lineEdit->setText(hexData);
-          toggleButton->setText("HEX");
+         lineEdit->setValidator(new QRegExpValidator(QRegExp("[0-9A-Fa-f ]*"), this));// HEX: 16진수 입력만 허용
       }
       else
       {
-          QByteArray hexData = QByteArray::fromHex(currentText.remove(' ').toUtf8());
-          QString asciiData = QString::fromUtf8(hexData);
-          lineEdit->setText(asciiData);
-          toggleButton->setText("ASCII");
-      }
-
-      qDebug() << "Toggle button clicked for row" << row + 1 << "state:" << (checked ? "HEX" : "ASCII");
-      toggleButtons[row]->setStyleSheet(checked ? "color: green;" : "color: blue;");
-   });
-
-   connect(sendButton, &QPushButton::clicked, this, [=]() {
-      QString data = lineEdit->text();
-      bool isHexMode = toggleButton->isChecked();
-
-      if (isHexMode)
-      {
-          QByteArray hexData = QByteArray::fromHex(data.remove(' ').toUtf8());
-          uartManager->writeSerialData(QString(hexData));
-          qDebug() << "Send button clicked for row" << row + 1 << "(HEX):" << hexData.toHex().toUpper();
-      }
-      else
-      {
-          uartManager->writeSerialData(data);
-          qDebug() << "Send button clicked for row" << row + 1 << "(ASCII):" << data;
+         lineEdit->setValidator(nullptr);// ASCII: Validator 제거 (모든 입력 허용)
       }
    });
-   */
    
    boxLayout->addWidget(label);
    boxLayout->addWidget(lineEdit);

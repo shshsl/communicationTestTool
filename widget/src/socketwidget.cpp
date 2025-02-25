@@ -1,39 +1,103 @@
 #include "widget/include/socketwidget.h"
 
 SocketWidget::SocketWidget(QWidget *parent) 
-    : QWidget(parent)//, socketManager(new SocketManager(this))
+    : QWidget(parent), socketManager(new SocketManager(this)),
+    m_nLayoutRow(0), m_nLayoutColumn(0)
 {
+    // UI 생성
+    QGridLayout *layout = new QGridLayout(this);
+    setLayout(layout);
+
+    QTabWidget *socketTabWidget = new QTabWidget(this);
+
+    // Server 
+    QWidget *serverTab = new QWidget();
+    QGridLayout *serverLayout = new QGridLayout(serverTab);
+    // serverLayout->addWidget(new QLabel("Server Settings"));
+    // serverLayout->addWidget(new QLineEdit("Enter server address"));
+    // serverLayout->addWidget(new QPushButton("Start Server"));
+
+    // Client
+    QWidget *clientTab = new QWidget();
+    QGridLayout *clientLayout = new QGridLayout(clientTab);
+    // clientLayout->addWidget(new QLabel("Client Settings"));
+    // clientLayout->addWidget(new QLineEdit("Enter client address"));
+    // clientLayout->addWidget(new QPushButton("Connect to Server"));
+    
+    QWidget *udpTab = new QWidget();
+    QGridLayout *udpLayout = new QGridLayout(udpTab);
+
+    socketTabWidget->addTab(serverTab, "TCP Server");
+    socketTabWidget->addTab(clientTab, "TCP Client");
+    socketTabWidget->addTab(udpTab, "UDP");
+    
+    createSetConnectLayout(serverLayout);
+    // createSetConnectLayout(clientLayout);
+
+    layout->addWidget(socketTabWidget);
+    
+    
+
+//     connectButton = new QPushButton("Connect", this);
+//     layout->addWidget(connectButton);
+//     connect(connectButton, SIGNAL(clicked()), this, SLOT(onConnectButtonClicked()));
+
+//     disconnectButton = new QPushButton("Disconnect", this);
+//     layout->addWidget(disconnectButton);
+//     connect(disconnectButton, SIGNAL(clicked()), this, SLOT(onDisconnectButtonClicked()));
+
+//     messageEdit = new QLineEdit(this);
+//     layout->addWidget(messageEdit);
+
+//     sendButton = new QPushButton("Send", this);
+//     layout->addWidget(sendButton);
+// //    connect(sendButton, SIGNAL(clicked()), this, SLOT(onSendButtonClicked());
+
+//     messageView = new QTextEdit(this);
+//     layout->addWidget(messageView);
+
     // connect(socketManager, SIGNAL(connected()), this, SLOT(onConnected()));
     // connect(socketManager, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
     // connect(socketManager, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onError(QAbstractSocket::SocketError)));
     // connect(socketManager, SIGNAL(messageReceived(QString)), this, SLOT(onMessageReceived(QString)));
     // connect(socketManager, SIGNAL(messageSent(QString)), this, SLOT(onMessageSend(QString)));
-
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    setLayout(layout);
-
-    connectButton = new QPushButton("Connect", this);
-    layout->addWidget(connectButton);
-    connect(connectButton, SIGNAL(clicked()), this, SLOT(onConnectButtonClicked()));
-
-    disconnectButton = new QPushButton("Disconnect", this);
-    layout->addWidget(disconnectButton);
-    connect(disconnectButton, SIGNAL(clicked()), this, SLOT(onDisconnectButtonClicked()));
-
-    messageEdit = new QLineEdit(this);
-    layout->addWidget(messageEdit);
-
-    sendButton = new QPushButton("Send", this);
-    layout->addWidget(sendButton);
-//    connect(sendButton, SIGNAL(clicked()), this, SLOT(onSendButtonClicked());
-
-    messageView = new QTextEdit(this);
-    layout->addWidget(messageView);
 }
 
 SocketWidget::~SocketWidget()
 {
+    if (this->layout() != nullptr) {
+        delete this->layout();
+    }
+    delete socketManager;
+}
+
+void SocketWidget::createSetConnectLayout(QGridLayout *parentLayout)
+{
+    // 24.2.25 :: 현재 사용하면 프로그램 터짐. - 수정필요.
+    // ip, port, protocol
+    QHBoxLayout *boxLayout = new QHBoxLayout();
+    QLabel *ipLabel = new QLabel("Address: ", this);
+    QLineEdit *ipEdit = new QLineEdit();
+    QLabel *portLabel = new QLabel("Port: ", this);
+    QLineEdit *portEdit = new QLineEdit();
     
+    boxLayout->addWidget(ipLabel);
+    boxLayout->addWidget(ipEdit);
+    boxLayout->addWidget(portLabel);
+    boxLayout->addWidget(portEdit);
+    
+    parentLayout->addLayout(boxLayout, m_nLayoutRow, 0);
+}
+
+void SocketWidget::createConnectionButton(QGridLayout *parentLayout, const QString &labelText, QPushButton *&pushButton)
+{
+    QPushButton *connectButton = new QPushButton();
+    QLabel *label = new QLabel();
+    label->setText(labelText);
+    parentLayout->addWidget(label);
+    parentLayout->addWidget(connectButton);
+    // pushButton = connectButton;
+    connect(connectButton, SIGNAL(clicked()), this, SLOT(onConnectButtonClicked()));
 }
 
 void SocketWidget::onConnectButtonClicked()

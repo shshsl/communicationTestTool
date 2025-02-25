@@ -2,11 +2,13 @@
 #define SOCKETWIDGET_H
 
 #include <QWidget>
+#include <QTabWidget>
 #include <QAbstractSocket>
 #include <QPushButton>
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QVBoxLayout>
+#include <QLabel>
 
 #include "manager/include/socketmanager.h"
 
@@ -40,12 +42,22 @@ private slots:
     void onMessageSend(QString message);
     
 private:
+    SocketManager *socketManager;
+    
+    void createSetConnectLayout(QGridLayout *parentLayout);
+    void createConnectionButton(QGridLayout *parentLayout, const QString &labelText, QPushButton *&pushButton);
+    void createSetMessageLayout(QGridLayout *parentLayout, const QString &labelText, QLineEdit *&lineEdit);
+    void createSetSendLayout(QGridLayout *parentLayout, const QString &labelText, QPushButton *&pushButton);
+    
+private:
     QPushButton *connectButton;
     QPushButton *disconnectButton;
     QLineEdit *messageEdit;
     QPushButton *sendButton;
     QTextEdit *messageView;
 
+    int m_nLayoutRow = 0;
+    int m_nLayoutColumn = 0;
 };
 
 #endif // SOCKETWIDGET_H
