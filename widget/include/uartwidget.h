@@ -17,6 +17,7 @@
 #include <QDateTime>
 
 #include "manager/include/uartmanager.h"
+#include "communicationenum.h"
 
 class UartWidget : public QWidget
 {
@@ -25,14 +26,6 @@ class UartWidget : public QWidget
 public:
     explicit UartWidget(QWidget *parent = nullptr);
     ~UartWidget();
-    
-    enum SERIAL_PORT_STATE
-    {
-        SERIAL_PORT_NONE = 0,
-        SERIAL_PORT_OPEN = 1,
-        SERIAL_PORT_CLOSE = 2,
-    };
-    Q_ENUM(SERIAL_PORT_STATE)
 
 private slots:
     void handleOpenButtonClicked();

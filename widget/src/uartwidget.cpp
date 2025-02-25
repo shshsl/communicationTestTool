@@ -367,13 +367,13 @@ void UartWidget::handlePortStateChanged(int state)
 
    switch (state)
    {
-   case SERIAL_PORT_STATE::SERIAL_PORT_OPEN:
+   case Communication::UartEnums::SerialPortState::SERIAL_PORT_OPEN:
       logMessage = "Serial port opened successfully.";
       break;
-   case SERIAL_PORT_STATE::SERIAL_PORT_CLOSE:
+   case Communication::UartEnums::SerialPortState::SERIAL_PORT_CLOSE:
       logMessage = "Serial port closed.";
       break;
-   case SERIAL_PORT_STATE::SERIAL_PORT_NONE:
+   case Communication::UartEnums::SerialPortState::SERIAL_PORT_NONE:
       logMessage = "Failed to open serial port.";
       break;
    default:
@@ -392,7 +392,7 @@ void UartWidget::optionStateChanged(int oState)
 {
    qDebug() << "change combo & btn state " << oState;
    
-   if (oState == SERIAL_PORT_STATE::SERIAL_PORT_OPEN)
+   if (oState == Communication::UartEnums::SerialPortState::SERIAL_PORT_OPEN)
    {
       openButton->setEnabled(false);
       closeButton->setEnabled(true);

@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui qml quick serialport
+CONFIG   += c++17
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -27,6 +28,7 @@ HEADERS  += \
                    manager/include/workerthread.h \
                    manager/include/socketmanager.h \
                    manager/include/uartmanager.h \
+    communicationenum.h
 
 RESOURCES += \
                     qml.qrc
