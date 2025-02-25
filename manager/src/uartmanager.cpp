@@ -54,6 +54,7 @@ void UartManager::closeSerialPort()
 
 void UartManager::readSerialData()
 {
+    qDebug() << "readSerialData !!";
     while (serialPort->canReadLine())
     {
         QByteArray data = serialPort->readLine();

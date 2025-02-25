@@ -28,7 +28,7 @@ UartWidget::UartWidget(QWidget *parent)
    createComboBoxLayout(optionGroupLayout, "Device : ", portSelector, {});
 
    createComboBoxLayout(optionGroupLayout, "Baudrate : ", baudrateSelector,
-                     {"2400", "4800", "9600", "14400", "19200", "38400", "57600", "115200"}, "115200");
+                     {"2400", "4800", "9600", "14400", "19200", "38400", "57600", "115200", "460800", "921600", "230400"}, "115200");
 
    createComboBoxLayout(optionGroupLayout, "Data Bits : ", dataBitsSelector,
                      {"5", "6", "7", "8"}, "8");

@@ -58,9 +58,11 @@ int main(int argc, char *argv[]) {
     tabWidget.setStyleSheet(
         "QTabBar::tab {"
         "   background-color:rgb(24, 164, 235);"
-        "   border: 2px solid white;"       // 기본 테두리 색상
+        "   border: 1px solid white;"       // 기본 테두리 색상
         "   border-radius: 4px;"          // 테두리 모서리를 둥글게
-        "   padding: 2px;"
+        "   padding: 1px;"
+        "   height: 20px;"
+        "   width: 100px;"
         "}"
         "QTabBar::tab:selected { background-color:rgb(16, 233, 233); }"
         "QTabBar::tab:hover { "

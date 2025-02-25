@@ -20,15 +20,19 @@ SOURCES += main.cpp\
                   manager/src/workerthread.cpp \
                   manager/src/socketmanager.cpp \
                   manager/src/uartmanager.cpp \
+    manager/socket/socketclient.cpp \
+    manager/socket/socketserver.cpp
 
 HEADERS  += \
+                   communicationenum.h \
                    widget/include/testapp.h \
                    widget/include/uartwidget.h \
                    widget/include/socketwidget.h \
                    manager/include/workerthread.h \
                    manager/include/socketmanager.h \
                    manager/include/uartmanager.h \
-    communicationenum.h
+    manager/socket/socketclient.h \
+    manager/socket/socketserver.h
 
 RESOURCES += \
                     qml.qrc
