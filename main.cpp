@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
     tabWidget.addTab(socketTab, "SOCKET");
     tabWidget.addTab(testWidget, "TEST");//test
     tabWidget.setMinimumSize(screenWidth * 0.25, screenHeight * 0.4);
-    tabWidget.resize(screenWidth * 0.3, screenHeight * 0.5);
+    tabWidget.resize(screenWidth * 0.3, screenHeight * 0.7);
     tabWidget.show();
 
     return app.exec();
