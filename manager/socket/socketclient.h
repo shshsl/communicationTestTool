@@ -4,15 +4,17 @@
 #include <QObject>
 #include <QTcpSocket>
 
-class SocketClient : public QObject {
+class SocketClient : public QObject
+{
     Q_OBJECT
 
 public:
     explicit SocketClient(QObject *parent = nullptr);
     ~SocketClient();
     
-    void connectToServer(const QString &host, quint16 port);
-    void sendMessage(const QString &message);
+    bool sendMessage(const QString &message);
+    QString receiveMessage();
+    int connectToServer(const QString &host, quint16 port);
 
 private slots:
     void onConnected();
@@ -20,7 +22,8 @@ private slots:
     void readServerData();
 
 private:
-    QTcpSocket *socket;
+    QTcpSocket *tcpSocket;
+    QString lastReceivedMessage;
 };
 
 #endif // SOCKETCLIENT_H

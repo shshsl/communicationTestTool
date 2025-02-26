@@ -10,8 +10,10 @@ SocketWidget::SocketWidget(QWidget *parent)
     layout->addWidget(socketTabWidget);
 
     createTabWidget(layout);
+    createOptionLayout(serverLayout);
     createClientsView(serverLayout);
 
+//    connect(socketManager, &SocketManager::newClientConnected, socketWidget, &SocketWidget::addClient);
 }
 
 SocketWidget::~SocketWidget()
@@ -40,7 +42,6 @@ void SocketWidget::createTabWidget(QGridLayout *parentLayout)
 
 void SocketWidget::createOptionLayout(QGridLayout *parentLayout)
 {
-    // 24.2.25 :: 현재 사용하면 프로그램 터짐. - 수정필요.
     // ip, port, protocol
     // 172.30.1.43
     QHBoxLayout *boxLayout = new QHBoxLayout();
@@ -87,10 +88,8 @@ void SocketWidget::createClientsView(QGridLayout *parentLayout)
     clientsLayout->setSpacing(10); // 클라이언트 간 간격
     clientsLayout->addStretch();   // 오른쪽 여백 추가
 
-    // 예시 클라이언트 추가 (테스트용)
-    addClient("192.168.1.1", QDateTime::currentDateTime());
-    addClient("172.30.1.43", QDateTime::currentDateTime().addSecs(-3600)); // 1시간 전
-
+    testFunction();
+    
     // QGridLayout에 clientsLayout 추가
     parentLayout->addLayout(clientsLayout, m_nLayoutRow + 1, 0); // 탭 아래에 배치 (행 조정 가능)
 }
@@ -105,18 +104,18 @@ void SocketWidget::addClient(const QString &ip, const QDateTime &connectTime)
     createFrameBox();
 
     // 클라이언트 위젯 생성 및 레이아웃 설정
-    QWidget *clientWidget = new QWidget(frame); // frame을 부모로 설정
-    QVBoxLayout *layout = new QVBoxLayout(clientWidget);
-    QLabel *ipLabel = new QLabel("IP: " + ip, clientWidget);
-    client.timeLabel = new QLabel("Time: 00:00:00", clientWidget);
+    QWidget *clientsViewWidget = new QWidget(frame); // frame을 부모로 설정
+    QVBoxLayout *layout = new QVBoxLayout(clientsViewWidget);
+    QLabel *ipLabel = new QLabel("🖥️ IP : " + ip, clientsViewWidget);
+    client.timeLabel = new QLabel("Time : 00:00:00", clientsViewWidget);
 
     layout->addWidget(ipLabel);
     layout->addWidget(client.timeLabel);
     layout->setContentsMargins(5, 5, 5, 5);
 
-    // QFrame에 clientWidget 추가
+    // QFrame에 clientsWidget 추가
     QVBoxLayout *frameLayout = new QVBoxLayout(frame);
-    frameLayout->addWidget(clientWidget);
+    frameLayout->addWidget(clientsViewWidget);
     frameLayout->setContentsMargins(0, 0, 0, 0); // 프레임 내부 여백 제거 (필요 시 조정)
 
     // 타이머 설정
@@ -179,3 +178,38 @@ int SocketWidget::resizeWidthForEdit(QLineEdit *lineEdit, Communication::Socket:
     return textWidth + padding + extraSpace;
 }
 
+void SocketWidget::testFunction()
+{
+    // 예시 클라이언트 추가 (테스트용)
+    addClient("192.168.1.1", QDateTime::currentDateTime());
+    addClient("172.30.1.43", QDateTime::currentDateTime().addSecs(-3600)); // 1시간 전
+}
+
+void SocketWidget::setupServer(int port)
+{
+    if (socketManager->startAsServer(port)) {
+        qDebug() << "Server started on port " << port;
+    }
+}
+
+void SocketWidget::setupClient(const QString &ip, int port)
+{
+//    if (socketManager->startAsClient(ip, port)) {
+//        qDebug() << "Connected to server at " << ip << ":" << port;
+//    }
+}
+
+void SocketWidget::sendMessage(const QString &message)
+{
+//    if (socketManager->send(message)) {
+//        qDebug() << "Sent: " << message;
+//    }
+}
+
+void SocketWidget::receiveMessage()
+{
+//    QString msg = socketManager->receive();
+//    if (!msg.empty()) {
+//        qDebug() << "Received: " << msg;
+//    }
+}

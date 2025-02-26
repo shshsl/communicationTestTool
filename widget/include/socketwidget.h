@@ -13,6 +13,7 @@
 #include <QStyleOptionFrame>
 #include <QTimer>
 #include <QDateTime>
+#include <QDebug>
 
 #include "manager/include/socketmanager.h"
 #include "communicationenum.h"
@@ -26,6 +27,10 @@ public:
     ~SocketWidget();
 
     void addClient(const QString &ip, const QDateTime &connectTime);
+    void setupServer(int port);
+    void setupClient(const QString &ip, int port);
+    void sendMessage(const QString &message);
+    void receiveMessage();
 
 signals:
     void connected();
@@ -48,6 +53,7 @@ private:
     void createFrameBox();
     
     int resizeWidthForEdit(QLineEdit *lineEdit, Communication::Socket::ConnectOption option);
+    void testFunction();
     
 private:
     QTabWidget *socketTabWidget;

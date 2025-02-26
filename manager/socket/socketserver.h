@@ -7,8 +7,6 @@
 #include <QDateTime>
 #include <QDebug>
 
-#include "widget/include/socketwidget.h"
-
 class SocketServer : public QObject {
     Q_OBJECT
 
@@ -16,17 +14,27 @@ public:
     explicit SocketServer(QObject *parent = nullptr);
     ~SocketServer();
     
-    void startServer(quint16 port);
+    int startServer(quint16 port);
+    void stopServer();
+    
+    bool sendMessage(const QString &message);
+    QString receiveMessage();
+
+signals:
+    void newClientConnected(QString &clientIp, QDateTime &connectTime);
 
 private slots:
     void handleNewConnection();
     void readClientData();
 
 private:
-    SocketWidget *socketWidget;
+    void testFunction();
 
-    QTcpServer *server;
+private:
+    QTcpServer *tcpServer;
     QList<QTcpSocket*> clients;
+    QString lastReceivedMessage;
+    
 };
 
 #endif // SOCKETSERVER_H
