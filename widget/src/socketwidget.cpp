@@ -18,7 +18,7 @@ SocketWidget::SocketWidget(QWidget *parent)
     QObject::connect(socketTabWidget, &QTabWidget::currentChanged, [=]() {
         int currentTab = socketTabWidget->currentIndex();
         // label->setText("current tab: " + QString::number(currentTab));
-        // m_nCurrentTab
+        m_nCurrentTab = currentTab;
         QString pButton = "";
         switch (currentTab)
         {
@@ -70,11 +70,13 @@ void SocketWidget::createOptionLayout(QGridLayout *parentLayout)
     // 172.30.1.43
     QHBoxLayout *boxLayout = new QHBoxLayout();
     QLabel *ipLabel = new QLabel("Address: ", this);
-    QLineEdit *ipEdit = new QLineEdit();
+    ipEdit = new QLineEdit();
     QLabel *portLabel = new QLabel("Port: ", this);
-    QLineEdit *portEdit = new QLineEdit();
+    portEdit = new QLineEdit();
     
     optionPushButton = new QPushButton("Start", this);
+    
+    testFunction();
     
     portLabel->setContentsMargins(10, 0, 0, 0);       //left, top, right, bottom
     ipEdit->setFixedWidth(110);
@@ -90,6 +92,14 @@ void SocketWidget::createOptionLayout(QGridLayout *parentLayout)
     
     boxLayout->addStretch(); // or>> boxLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
     parentLayout->addLayout(boxLayout, m_nLayoutRow, 0);
+    
+    connect(ipEdit, &QLineEdit::textChanged, this, [](const QString &text) {
+        qDebug() << "IP changed to: " << text;
+    });
+    connect(portEdit, &QLineEdit::textChanged, this, [](const QString &text) {
+        qDebug() << "Port changed to: " << text;
+    });
+    connect(optionPushButton, &QPushButton::clicked, this, &SocketWidget::onOptionButtonClicked);
 }
 
 void SocketWidget::createClientsView(QGridLayout *parentLayout)
@@ -115,7 +125,7 @@ void SocketWidget::createClientsView(QGridLayout *parentLayout)
     clientsLayout->setSpacing(10); // 클라이언트 간 간격
     clientsLayout->addStretch();   // 오른쪽 여백 추가
 
-    testFunction();
+    // testFunction();  //for test - (25.2.26)
     
     // QGridLayout에 clientsLayout 추가
     parentLayout->addLayout(clientsLayout, m_nLayoutRow + 1, 0); // 탭 아래에 배치 (행 조정 가능)
@@ -207,9 +217,13 @@ int SocketWidget::resizeWidthForEdit(QLineEdit *lineEdit, Communication::Socket:
 
 void SocketWidget::testFunction()
 {
+    // 기본값 설정
+    ipEdit->setText("172.30.1.43");  // 테스트용 기본 IP
+    portEdit->setText("8080");       // 테스트용 기본 포트
+    
     // 예시 클라이언트 추가 (테스트용)
-    addClient("192.168.1.1", QDateTime::currentDateTime());
-    addClient("172.30.1.43", QDateTime::currentDateTime().addSecs(-3600)); // 1시간 전
+    // addClient("192.168.1.1", QDateTime::currentDateTime());
+    // addClient("172.30.1.43", QDateTime::currentDateTime().addSecs(-3600)); // 1시간 전
 }
 
 void SocketWidget::setupServer(int port)
@@ -246,3 +260,62 @@ void SocketWidget::receiveMessage()
         qDebug() << "msg is empty !!";
     }
 }
+
+void SocketWidget::onOptionButtonClicked()
+{
+    QString ip = ipEdit->text().trimmed();
+    QString portText = portEdit->text().trimmed();
+    bool ok;
+    int port = portText.toInt(&ok);
+
+    qDebug() << "IP: " << ip << " | Port: " << portText;
+
+    if (m_nCurrentTab == 0) // 서버
+    {
+        if (ok && port >= 1025 && port <= 65535)
+        {
+            setupServer(port);
+        }
+        else
+        {
+            qDebug() << "[Server] Invalid port! Enter a number between 1025 and 65535.";
+        }
+    }
+    else if (m_nCurrentTab == 1) // 클라이언트
+    {
+        QHostAddress address(ip);
+        if (!ip.isEmpty() && !address.isNull() && ok && port >= 1025 && port <= 65535)
+        {
+            setupClient(ip, port);
+        }
+        else
+        {
+            qDebug() << "[Client] Invalid input! Ensure IP is valid and port is between 1025 and 65535.";
+        }
+    }
+    else
+    {
+        qDebug() << "UDP mode not implemented yet.";
+    }
+}
+
+
+// ipv4 유효성 검사 Test 용.
+// #include <QRegExp>
+
+// bool isValidIPv4(const QString &ip)
+// {
+//     QRegExp ipPattern("^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$");
+//     if (!ipPattern.exactMatch(ip))
+//         return false;
+
+//     QStringList parts = ip.split(".");
+//     for (const QString &part : parts)
+//     {
+//         bool ok;
+//         int num = part.toInt(&ok);
+//         if (!ok || num < 0 || num > 255)
+//             return false;
+//     }
+//     return true;
+// }

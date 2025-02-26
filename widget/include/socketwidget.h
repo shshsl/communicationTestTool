@@ -14,6 +14,7 @@
 #include <QTimer>
 #include <QDateTime>
 #include <QDebug>
+#include <QHostAddress> // IP 유효성 검사에 사용
 
 #include "manager/include/socketmanager.h"
 #include "communicationenum.h"
@@ -42,6 +43,7 @@ signals:
 public slots:
 
 private slots:
+    void onOptionButtonClicked();
     void updateElapsedTime();
 
 private:
@@ -64,6 +66,8 @@ private:
     QGridLayout *clientLayout;
     QGridLayout *udpLayout;
     
+    QLineEdit *ipEdit;
+    QLineEdit *portEdit;
     QPushButton *optionPushButton;
     QPushButton *connectButton;
     QPushButton *disconnectButton;
