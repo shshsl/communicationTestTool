@@ -35,9 +35,19 @@
 #include "widget/include/socketwidget.h"
 
 #include <QWidget>
+#include <QSysInfo>
+#include <QDebug>
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
+    
+    // sysinfo.
+    QString osName = QSysInfo::prettyProductName();
+    QString osType = QSysInfo::kernelType();
+    QString osVersion = QSysInfo::kernelVersion();
+    qDebug() << "Current OS :   " << osName;
+    qDebug() << "OS Type     :   " << osType;
+    qDebug() << "OS Version :   " << osVersion;
 
     QTabWidget tabWidget;
 

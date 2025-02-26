@@ -64,12 +64,14 @@ private:
     QGridLayout *clientLayout;
     QGridLayout *udpLayout;
     
+    QPushButton *optionPushButton;
     QPushButton *connectButton;
     QPushButton *disconnectButton;
     QLineEdit *messageEdit;
     QPushButton *sendButton;
     QTextEdit *messageView;
 
+    int m_nCurrentTab = 0;
     int m_nLayoutRow = 0;
     int m_nLayoutColumn = 0;
     

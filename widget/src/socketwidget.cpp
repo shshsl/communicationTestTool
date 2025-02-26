@@ -12,8 +12,32 @@ SocketWidget::SocketWidget(QWidget *parent)
     createTabWidget(layout);
     createOptionLayout(serverLayout);
     createClientsView(serverLayout);
+    createOptionLayout(clientLayout);
 
 //    connect(socketManager, &SocketManager::newClientConnected, socketWidget, &SocketWidget::addClient);
+    QObject::connect(socketTabWidget, &QTabWidget::currentChanged, [=]() {
+        int currentTab = socketTabWidget->currentIndex();
+        // label->setText("current tab: " + QString::number(currentTab));
+        // m_nCurrentTab
+        QString pButton = "";
+        switch (currentTab)
+        {
+        case 0:
+            pButton = "Start";
+            break;
+        case 1:
+            pButton = "Connect";
+            break;
+        case 2:
+            pButton = "UDP Server";
+            break;
+
+        default:
+            break;
+        }
+        optionPushButton->setText(pButton);
+        qDebug() << "currentTab: " << currentTab;
+    });
 }
 
 SocketWidget::~SocketWidget()
@@ -50,6 +74,8 @@ void SocketWidget::createOptionLayout(QGridLayout *parentLayout)
     QLabel *portLabel = new QLabel("Port: ", this);
     QLineEdit *portEdit = new QLineEdit();
     
+    optionPushButton = new QPushButton("Start", this);
+    
     portLabel->setContentsMargins(10, 0, 0, 0);       //left, top, right, bottom
     ipEdit->setFixedWidth(110);
     portEdit->setFixedWidth(55);
@@ -60,6 +86,7 @@ void SocketWidget::createOptionLayout(QGridLayout *parentLayout)
     boxLayout->addWidget(ipEdit);
     boxLayout->addWidget(portLabel);
     boxLayout->addWidget(portEdit);
+    boxLayout->addWidget(optionPushButton);
     
     boxLayout->addStretch(); // or>> boxLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
     parentLayout->addLayout(boxLayout, m_nLayoutRow, 0);
@@ -194,22 +221,28 @@ void SocketWidget::setupServer(int port)
 
 void SocketWidget::setupClient(const QString &ip, int port)
 {
-//    if (socketManager->startAsClient(ip, port)) {
-//        qDebug() << "Connected to server at " << ip << ":" << port;
-//    }
+   if (socketManager->startAsClient(ip, port)) {
+       qDebug() << "Connected to server at " << ip << ":" << port;
+   }
 }
 
 void SocketWidget::sendMessage(const QString &message)
 {
-//    if (socketManager->send(message)) {
-//        qDebug() << "Sent: " << message;
-//    }
+    if (socketManager->send(message))
+    {
+        qDebug() << "Sent: " << message;
+    }
 }
 
 void SocketWidget::receiveMessage()
 {
-//    QString msg = socketManager->receive();
-//    if (!msg.empty()) {
-//        qDebug() << "Received: " << msg;
-//    }
+    QString msg = socketManager->receive();
+    if (msg != "")
+    {
+        qDebug() << "Received: " << msg;
+    }
+    else
+    {
+        qDebug() << "msg is empty !!";
+    }
 }
