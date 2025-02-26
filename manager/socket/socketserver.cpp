@@ -25,15 +25,6 @@ void SocketServer::startServer(quint16 port)
     qDebug() << "Server started on port" << port;
 }
 
-void SocketServer::handleNewConnection()
-{
-    QTcpSocket *client = server->nextPendingConnection();
-    clients.append(client);
-    connect(client, &QTcpSocket::readyRead, this, &SocketServer::readClientData);
-    connect(client, &QTcpSocket::disconnected, client, &QTcpSocket::deleteLater);
-    qDebug() << "New client connected:" << client->peerAddress().toString();
-}
-
 void SocketServer::readClientData()
 {
     QTcpSocket *client = qobject_cast<QTcpSocket*>(sender());
@@ -46,3 +37,21 @@ void SocketServer::readClientData()
     client->write("Echo: " + data);
 }
 
+void SocketServer::handleNewConnection()
+{
+    QTcpSocket *client = server->nextPendingConnection();
+    QString clientIp = client->peerAddress().toString();
+    QDateTime connectTime = QDateTime::currentDateTime();
+
+    // SocketWidget에 클라이언트 추가
+    socketWidget = findChild<SocketWidget*>("socketWidget");
+    if (socketWidget) {
+        socketWidget->addClient(clientIp, connectTime);
+    }
+
+    clients.append(client);
+    connect(client, &QTcpSocket::readyRead, this, &SocketServer::readClientData);
+    connect(client, &QTcpSocket::disconnected, client, &QTcpSocket::deleteLater);
+    
+    qDebug() << "New client connected:" << client->peerAddress().toString();
+}

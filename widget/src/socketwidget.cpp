@@ -2,15 +2,17 @@
 
 SocketWidget::SocketWidget(QWidget *parent) 
     : QWidget(parent), socketManager(new SocketManager(this)),
-    m_nLayoutRow(0), m_nLayoutColumn(0)
+    m_nLayoutRow(0), m_nLayoutColumn(0), clientsLayout(nullptr), socketTabWidget(new QTabWidget(this))
 {
     // UI 생성
     QGridLayout *layout = new QGridLayout(this);
     setLayout(layout);
 
     createTabWidget(layout);
-    createOptionLayout(serverLayout);
+    // createOptionLayout(serverLayout);
     // createSetConnectLayout(clientLayout);
+    
+    createClientsView(serverLayout);
 
     layout->addWidget(socketTabWidget);
     
@@ -101,6 +103,75 @@ void SocketWidget::createConnectionButton(QGridLayout *parentLayout, const QStri
     parentLayout->addWidget(connectButton);
     // pushButton = connectButton;
     connect(connectButton, SIGNAL(clicked()), this, SLOT(onConnectButtonClicked()));
+}
+
+void SocketWidget::createClientsView(QGridLayout *parentLayout)
+{
+    // 기존 clientsLayout 정리
+    if (clientsLayout) {
+        QLayoutItem *item;
+        while ((item = clientsLayout->takeAt(0)) != nullptr) {
+            delete item->widget();
+            delete item;
+        }
+        delete clientsLayout;
+
+        for (ClientInfo &client : clients) {
+            client.timer->stop();
+            delete client.timer;
+        }
+        clients.clear();
+    }
+
+    // 새로운 가로 레이아웃 생성
+    clientsLayout = new QHBoxLayout();
+    clientsLayout->setSpacing(10); // 클라이언트 간 간격
+    clientsLayout->addStretch();   // 오른쪽 여백 추가
+
+    // 예시 클라이언트 추가 (테스트용)
+    addClient("192.168.1.1", QDateTime::currentDateTime());
+    addClient("172.30.1.43", QDateTime::currentDateTime().addSecs(-3600)); // 1시간 전
+
+    // QGridLayout에 clientsLayout 추가
+    parentLayout->addLayout(clientsLayout, m_nLayoutRow + 1, 0); // 탭 아래에 배치 (행 조정 가능)
+}
+
+void SocketWidget::addClient(const QString &ip, const QDateTime &connectTime)
+{
+    // 클라이언트 정보 생성
+    ClientInfo client;
+    client.ipAddress = ip;
+    client.connectTime = connectTime;
+
+    QWidget *clientWidget = new QWidget(this);
+    QVBoxLayout *layout = new QVBoxLayout(clientWidget);
+    QLabel *ipLabel = new QLabel("IP: " + ip, clientWidget);
+    client.timeLabel = new QLabel("Time: 00:00:00", clientWidget);
+
+    layout->addWidget(ipLabel);
+    layout->addWidget(client.timeLabel);
+    layout->setContentsMargins(5, 5, 5, 5);
+
+    // 타이머 설정
+    client.timer = new QTimer(this);
+    connect(client.timer, &QTimer::timeout, this, &SocketWidget::updateElapsedTime);
+    client.timer->start(1000); // 1초 간격
+
+    // 클라이언트 목록에 추가
+    clients.append(client);
+    clientsLayout->insertWidget(clientsLayout->count() - 1, clientWidget); // 스트레치 앞에 추가
+
+    // 초기 시간 업데이트
+    updateElapsedTime();
+}
+
+void SocketWidget::updateElapsedTime()
+{
+    for (ClientInfo &client : clients) {
+        qint64 seconds = client.connectTime.secsTo(QDateTime::currentDateTime());
+        QTime elapsedTime = QTime(0, 0).addSecs(seconds);
+        client.timeLabel->setText("Time: " + elapsedTime.toString("hh:mm:ss"));
+    }
 }
 
 void SocketWidget::onConnectButtonClicked()

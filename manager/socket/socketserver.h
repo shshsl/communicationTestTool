@@ -4,6 +4,10 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QObject>
+#include <QDateTime>
+#include <QDebug>
+
+#include "widget/include/socketwidget.h"
 
 class SocketServer : public QObject {
     Q_OBJECT
@@ -19,6 +23,8 @@ private slots:
     void readClientData();
 
 private:
+    SocketWidget *socketWidget;
+
     QTcpServer *server;
     QList<QTcpSocket*> clients;
 };
