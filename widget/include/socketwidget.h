@@ -37,17 +37,6 @@ signals:
 public slots:
 
 private slots:
-    void onConnectButtonClicked();
-    void onDisconnectButtonClicked();
-    void onSendButtonClicked();
-    // void onReceiveButtonClicked();
-    void onConnected();
-    void onDisconnected();
-    // void onReadyRead();
-    void onError(QAbstractSocket::SocketError error);
-    void onMessageReceived(QString message);
-    void onMessageSend(QString message);
-    
     void updateElapsedTime();
 
 private:
@@ -55,12 +44,8 @@ private:
     
     void createTabWidget(QGridLayout *parentLayout);
     void createOptionLayout(QGridLayout *parentLayout);
-    void createConnectionButton(QGridLayout *parentLayout, const QString &labelText, QPushButton *&pushButton);
-    
     void createClientsView(QGridLayout *parentLayout);
-    
-    void createSetMessageLayout(QGridLayout *parentLayout, const QString &labelText, QLineEdit *&lineEdit);
-    void createSetSendLayout(QGridLayout *parentLayout, const QString &labelText, QPushButton *&pushButton);
+    void createFrameBox();
     
     int resizeWidthForEdit(QLineEdit *lineEdit, Communication::Socket::ConnectOption option);
     
@@ -99,6 +84,7 @@ private:
     QHBoxLayout *clientsLayout;
     QList<ClientInfo> clients;
     
+    QFrame *frame;
 };
 
 #endif // SOCKETWIDGET_H

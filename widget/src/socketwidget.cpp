@@ -7,40 +7,11 @@ SocketWidget::SocketWidget(QWidget *parent)
     // UI 생성
     QGridLayout *layout = new QGridLayout(this);
     setLayout(layout);
+    layout->addWidget(socketTabWidget);
 
     createTabWidget(layout);
-    // createOptionLayout(serverLayout);
-    // createSetConnectLayout(clientLayout);
-    
     createClientsView(serverLayout);
 
-    layout->addWidget(socketTabWidget);
-    
-    
-
-//     connectButton = new QPushButton("Connect", this);
-//     layout->addWidget(connectButton);
-//     connect(connectButton, SIGNAL(clicked()), this, SLOT(onConnectButtonClicked()));
-
-//     disconnectButton = new QPushButton("Disconnect", this);
-//     layout->addWidget(disconnectButton);
-//     connect(disconnectButton, SIGNAL(clicked()), this, SLOT(onDisconnectButtonClicked()));
-
-//     messageEdit = new QLineEdit(this);
-//     layout->addWidget(messageEdit);
-
-//     sendButton = new QPushButton("Send", this);
-//     layout->addWidget(sendButton);
-// //    connect(sendButton, SIGNAL(clicked()), this, SLOT(onSendButtonClicked());
-
-//     messageView = new QTextEdit(this);
-//     layout->addWidget(messageView);
-
-    // connect(socketManager, SIGNAL(connected()), this, SLOT(onConnected()));
-    // connect(socketManager, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
-    // connect(socketManager, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onError(QAbstractSocket::SocketError)));
-    // connect(socketManager, SIGNAL(messageReceived(QString)), this, SLOT(onMessageReceived(QString)));
-    // connect(socketManager, SIGNAL(messageSent(QString)), this, SLOT(onMessageSend(QString)));
 }
 
 SocketWidget::~SocketWidget()
@@ -53,7 +24,6 @@ SocketWidget::~SocketWidget()
 
 void SocketWidget::createTabWidget(QGridLayout *parentLayout)
 {
-    socketTabWidget = new QTabWidget(this);
     serverTab = new QWidget();
     serverLayout = new QGridLayout(serverTab);
     clientTab = new QWidget();
@@ -94,17 +64,6 @@ void SocketWidget::createOptionLayout(QGridLayout *parentLayout)
     parentLayout->addLayout(boxLayout, m_nLayoutRow, 0);
 }
 
-void SocketWidget::createConnectionButton(QGridLayout *parentLayout, const QString &labelText, QPushButton *&pushButton)
-{
-    QPushButton *connectButton = new QPushButton();
-    QLabel *label = new QLabel();
-    label->setText(labelText);
-    parentLayout->addWidget(label);
-    parentLayout->addWidget(connectButton);
-    // pushButton = connectButton;
-    connect(connectButton, SIGNAL(clicked()), this, SLOT(onConnectButtonClicked()));
-}
-
 void SocketWidget::createClientsView(QGridLayout *parentLayout)
 {
     // 기존 clientsLayout 정리
@@ -143,7 +102,10 @@ void SocketWidget::addClient(const QString &ip, const QDateTime &connectTime)
     client.ipAddress = ip;
     client.connectTime = connectTime;
 
-    QWidget *clientWidget = new QWidget(this);
+    createFrameBox();
+
+    // 클라이언트 위젯 생성 및 레이아웃 설정
+    QWidget *clientWidget = new QWidget(frame); // frame을 부모로 설정
     QVBoxLayout *layout = new QVBoxLayout(clientWidget);
     QLabel *ipLabel = new QLabel("IP: " + ip, clientWidget);
     client.timeLabel = new QLabel("Time: 00:00:00", clientWidget);
@@ -152,6 +114,11 @@ void SocketWidget::addClient(const QString &ip, const QDateTime &connectTime)
     layout->addWidget(client.timeLabel);
     layout->setContentsMargins(5, 5, 5, 5);
 
+    // QFrame에 clientWidget 추가
+    QVBoxLayout *frameLayout = new QVBoxLayout(frame);
+    frameLayout->addWidget(clientWidget);
+    frameLayout->setContentsMargins(0, 0, 0, 0); // 프레임 내부 여백 제거 (필요 시 조정)
+
     // 타이머 설정
     client.timer = new QTimer(this);
     connect(client.timer, &QTimer::timeout, this, &SocketWidget::updateElapsedTime);
@@ -159,7 +126,7 @@ void SocketWidget::addClient(const QString &ip, const QDateTime &connectTime)
 
     // 클라이언트 목록에 추가
     clients.append(client);
-    clientsLayout->insertWidget(clientsLayout->count() - 1, clientWidget); // 스트레치 앞에 추가
+    clientsLayout->insertWidget(clientsLayout->count() - 1, frame); // frame을 추가
 
     // 초기 시간 업데이트
     updateElapsedTime();
@@ -174,44 +141,12 @@ void SocketWidget::updateElapsedTime()
     }
 }
 
-void SocketWidget::onConnectButtonClicked()
+void SocketWidget::createFrameBox()
 {
-    // socketManager->connectToHost();
-}
-
-void SocketWidget::onDisconnectButtonClicked()
-{
-    // socketManager->disconnectFromHost();
-}
-
-void SocketWidget::onSendButtonClicked()
-{
-    // socketManager->sendMessage(messageEdit->text());
-}
-
-void SocketWidget::onConnected()
-{
-    messageView->append("Connected");
-}
-
-void SocketWidget::onDisconnected()
-{
-    messageView->append("Disconnected");
-}
-
-void SocketWidget::onError(QAbstractSocket::SocketError error)
-{
-    // messageView->append("Error: " + socketManager->errorString());
-}
-
-void SocketWidget::onMessageReceived(QString message)
-{
-    messageView->append("Received: " + message);
-}
-
-void SocketWidget::onMessageSend(QString message)
-{
-    messageView->append("Sent: " + message);
+    frame = new QFrame(this);
+    frame->setFrameShape(QFrame::Box);
+    frame->setFrameShadow(QFrame::Plain);
+    frame->setLineWidth(2);
 }
 
 // check for edit size.
