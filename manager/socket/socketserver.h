@@ -1,17 +1,26 @@
 #ifndef SOCKETSERVER_H
 #define SOCKETSERVER_H
 
+#include <QTcpServer>
+#include <QTcpSocket>
 #include <QObject>
 
-class SocketServer : public QObject
-{
+class SocketServer : public QObject {
     Q_OBJECT
+
 public:
-    explicit SocketServer(QObject *parent = 0);
+    explicit SocketServer(QObject *parent = nullptr);
+    ~SocketServer();
+    
+    void startServer(quint16 port);
 
-signals:
+private slots:
+    void handleNewConnection();
+    void readClientData();
 
-public slots:
+private:
+    QTcpServer *server;
+    QList<QTcpSocket*> clients;
 };
 
 #endif // SOCKETSERVER_H

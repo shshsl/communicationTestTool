@@ -4,7 +4,8 @@
 #
 #-------------------------------------------------
 
-QT       += core gui qml quick serialport
+QT       += core gui qml quick \
+            serialport network
 CONFIG   += c++17
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
