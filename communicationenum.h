@@ -23,19 +23,19 @@ namespace Communication
     class Socket
     {
         Q_GADGET
-        Q_ENUMS(TestState)
+        Q_ENUMS(ConnectOption)
         
     public:
-        enum TestState
+        enum ConnectOption
         {
-            TEST_NONE = 0,
-            TEST_OPEN = 1,
-            TEST_CLOSE = 2,
+            OPTION_NONE = 0,
+            IP_ADDRESS = 1,
+            PORT = 2,
         };
     };
 }
 // 열거형을 QVariant로 사용하려면 Q_DECLARE_METATYPE 필요
 Q_DECLARE_METATYPE(Communication::Uart::SerialPortState)
-Q_DECLARE_METATYPE(Communication::Socket::TestState)
+Q_DECLARE_METATYPE(Communication::Socket::ConnectOption)
 
 #endif // COMMUNICATIONENUM_H

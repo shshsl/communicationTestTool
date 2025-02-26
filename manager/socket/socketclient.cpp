@@ -7,9 +7,6 @@ SocketClient::SocketClient(QObject *parent)
     connect(socket, &QTcpSocket::connected, this, &SocketClient::onConnected);
     connect(socket, &QTcpSocket::disconnected, this, &SocketClient::onDisconnected);
     connect(socket, &QTcpSocket::readyRead, this, &SocketClient::readServerData);
-    connect(socket, &QTcpSocket::errorOccurred, [](QAbstractSocket::SocketError socketError) {
-        qDebug() << "Socket error:" << socketError;
-    });
 }
 
 SocketClient::~SocketClient()

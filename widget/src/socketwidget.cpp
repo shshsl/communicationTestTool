@@ -8,30 +8,8 @@ SocketWidget::SocketWidget(QWidget *parent)
     QGridLayout *layout = new QGridLayout(this);
     setLayout(layout);
 
-    QTabWidget *socketTabWidget = new QTabWidget(this);
-
-    // Server 
-    QWidget *serverTab = new QWidget();
-    QGridLayout *serverLayout = new QGridLayout(serverTab);
-    // serverLayout->addWidget(new QLabel("Server Settings"));
-    // serverLayout->addWidget(new QLineEdit("Enter server address"));
-    // serverLayout->addWidget(new QPushButton("Start Server"));
-
-    // Client
-    QWidget *clientTab = new QWidget();
-    QGridLayout *clientLayout = new QGridLayout(clientTab);
-    // clientLayout->addWidget(new QLabel("Client Settings"));
-    // clientLayout->addWidget(new QLineEdit("Enter client address"));
-    // clientLayout->addWidget(new QPushButton("Connect to Server"));
-    
-    QWidget *udpTab = new QWidget();
-    QGridLayout *udpLayout = new QGridLayout(udpTab);
-
-    socketTabWidget->addTab(serverTab, "TCP Server");
-    socketTabWidget->addTab(clientTab, "TCP Client");
-    socketTabWidget->addTab(udpTab, "UDP");
-    
-    createSetConnectLayout(serverLayout);
+    createTabWidget(layout);
+    createOptionLayout(serverLayout);
     // createSetConnectLayout(clientLayout);
 
     layout->addWidget(socketTabWidget);
@@ -71,7 +49,24 @@ SocketWidget::~SocketWidget()
     delete socketManager;
 }
 
-void SocketWidget::createSetConnectLayout(QGridLayout *parentLayout)
+void SocketWidget::createTabWidget(QGridLayout *parentLayout)
+{
+    socketTabWidget = new QTabWidget(this);
+    serverTab = new QWidget();
+    serverLayout = new QGridLayout(serverTab);
+    clientTab = new QWidget();
+    clientLayout = new QGridLayout(clientTab);
+    udpTab = new QWidget();
+    udpLayout = new QGridLayout(udpTab);
+
+    socketTabWidget->addTab(serverTab, "TCP Server");
+    socketTabWidget->addTab(clientTab, "TCP Client");
+    socketTabWidget->addTab(udpTab, "UDP");
+
+    parentLayout->addWidget(socketTabWidget);
+}
+
+void SocketWidget::createOptionLayout(QGridLayout *parentLayout)
 {
     // 24.2.25 :: 현재 사용하면 프로그램 터짐. - 수정필요.
     // ip, port, protocol
@@ -83,16 +78,17 @@ void SocketWidget::createSetConnectLayout(QGridLayout *parentLayout)
     QLineEdit *portEdit = new QLineEdit();
     
     portLabel->setContentsMargins(10, 0, 0, 0);       //left, top, right, bottom
-    ipEdit->setFixedWidth(130);
-    portEdit->setFixedWidth(60);
-    ipEdit->setMaxLength(calculateMaxCharacters(ipEdit));
-    portEdit->setMaxLength(calculateMaxCharacters(portEdit));
+    ipEdit->setFixedWidth(110);
+    portEdit->setFixedWidth(55);
+    ipEdit->setMaxLength(15);   // ip: 0.0.0.0 ~ 255.255.255.255
+    portEdit->setMaxLength(5);   // port: 1025 ~ 65535
     
-    boxLayout->addWidget(ipLabel, Qt::AlignLeft);
-    boxLayout->addWidget(ipEdit, Qt::AlignLeft);
-    boxLayout->addWidget(portLabel, Qt::AlignLeft);
-    boxLayout->addWidget(portEdit, Qt::AlignLeft);
+    boxLayout->addWidget(ipLabel);
+    boxLayout->addWidget(ipEdit);
+    boxLayout->addWidget(portLabel);
+    boxLayout->addWidget(portEdit);
     
+    boxLayout->addStretch(); // or>> boxLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
     parentLayout->addLayout(boxLayout, m_nLayoutRow, 0);
 }
 
@@ -147,12 +143,33 @@ void SocketWidget::onMessageSend(QString message)
     messageView->append("Sent: " + message);
 }
 
-int SocketWidget::calculateMaxCharacters(QLineEdit *lineEdit, bool isNum)
+// check for edit size.
+int SocketWidget::resizeWidthForEdit(QLineEdit *lineEdit, Communication::Socket::ConnectOption option)
 {
+    QString optionStr = "";
+    switch (option)
+    {
+    case Communication::Socket::ConnectOption::IP_ADDRESS:
+        optionStr = "255.255.255.255";
+        break;
+    case Communication::Socket::ConnectOption::PORT:
+        optionStr = "65535";
+        break;
+    
+    default:
+        optionStr = "00000 00000 00000 00000";
+        break;
+    }
+    
     QFontMetrics fm(lineEdit->font());
-    int width = lineEdit->width();
-    // char c = isNum ? '2' : 'M';
-    char c = 'M';
-    return width / fm.boundingRect(c).width(); // char 'X' width
+    int textWidth = fm.width(optionStr);
+
+    QStyleOptionFrame styleOption;
+    styleOption.initFrom(lineEdit);
+    int padding = lineEdit->style()->pixelMetric(QStyle::PM_DefaultFrameWidth, &styleOption, lineEdit) * 2; // left, right
+    int extraSpace = 20; // cusor or extra
+
+    qDebug() << optionStr << " : " << textWidth + padding + extraSpace;
+    return textWidth + padding + extraSpace;
 }
 

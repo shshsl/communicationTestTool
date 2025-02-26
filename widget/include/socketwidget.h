@@ -10,8 +10,10 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QFontMetrics>
+#include <QStyleOptionFrame>
 
 #include "manager/include/socketmanager.h"
+#include "communicationenum.h"
 
 class SocketWidget : public QWidget
 {
@@ -45,14 +47,23 @@ private slots:
 private:
     SocketManager *socketManager;
     
-    void createSetConnectLayout(QGridLayout *parentLayout);
+    void createTabWidget(QGridLayout *parentLayout);
+    void createOptionLayout(QGridLayout *parentLayout);
     void createConnectionButton(QGridLayout *parentLayout, const QString &labelText, QPushButton *&pushButton);
     void createSetMessageLayout(QGridLayout *parentLayout, const QString &labelText, QLineEdit *&lineEdit);
     void createSetSendLayout(QGridLayout *parentLayout, const QString &labelText, QPushButton *&pushButton);
     
-    int calculateMaxCharacters(QLineEdit *lineEdit, bool isNum = false);
+    int resizeWidthForEdit(QLineEdit *lineEdit, Communication::Socket::ConnectOption option);
     
 private:
+    QTabWidget *socketTabWidget;
+    QWidget *serverTab;
+    QWidget *clientTab;
+    QWidget *udpTab;
+    QGridLayout *serverLayout;
+    QGridLayout *clientLayout;
+    QGridLayout *udpLayout;
+    
     QPushButton *connectButton;
     QPushButton *disconnectButton;
     QLineEdit *messageEdit;
