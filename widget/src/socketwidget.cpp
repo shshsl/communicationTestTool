@@ -84,6 +84,9 @@ void SocketWidget::createTabWidget(QGridLayout *parentLayout)
     udpTab = new QWidget();
     udpLayout = new QGridLayout(udpTab);
 
+    QLabel *udpLabel = new QLabel(" > To be updated later ... !! ", udpTab);
+    udpLayout->addWidget(udpLabel, 0, 0);
+
     socketTabWidget->addTab(serverTab, "TCP Server");
     socketTabWidget->addTab(clientTab, "TCP Client");
     socketTabWidget->addTab(udpTab, "UDP");
