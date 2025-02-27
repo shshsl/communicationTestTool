@@ -28,13 +28,18 @@ public:
 
     // common
     bool send(const QString &message);
-    QString receive();
 
 signals:
     void addClientView(QString clientAddress, QDateTime connectTime);
+    void receiveMessageToLog(QString);
 
 public slots:
     void addClientToServer(QTcpSocket *clientSocket);
+    void receive(const QString &message);
+
+private:
+    void setupConnections();
+    void clearConnections();
 
 private:
     SocketServer* server;

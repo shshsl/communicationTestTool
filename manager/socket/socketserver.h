@@ -22,6 +22,7 @@ public:
 
 signals:
     void newClientConnected(QTcpSocket *clientSocket);
+    void notifyReceiveToManager(QString);
 
 private slots:
     void handleNewConnection();
@@ -33,7 +34,7 @@ private:
 private:
     QTcpServer *tcpServer;
     QList<QTcpSocket*> clients;
-    QString lastReceivedMessage;
+    QString m_sLastReceived;
     
 };
 

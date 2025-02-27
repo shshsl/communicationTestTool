@@ -5,12 +5,24 @@ SocketManager::SocketManager(QObject *parent) : QObject(parent),
     client(nullptr),
     isServerMode(false)
 {
-    
+    setupConnections();
 }
 
-SocketManager::~SocketManager() {
+SocketManager::~SocketManager()
+{
+    clearConnections();
     if (server) delete server;
     if (client) delete client;
+}
+
+void SocketManager::setupConnections()
+{
+    connect(server, &SocketServer::notifyReceiveToManager, this, &SocketManager::receive);
+}
+
+void SocketManager::clearConnections()
+{
+    
 }
 
 bool SocketManager::startAsServer(int port)
@@ -50,6 +62,8 @@ void SocketManager::stopClient()
 
 bool SocketManager::send(const QString &message)
 {
+    qDebug() << "** message from what ?=  " << isServerMode << " * " << server << " * " << client << " * " << message;
+    
     if (isServerMode && server)
     {
         return server->sendMessage(message);
@@ -61,17 +75,21 @@ bool SocketManager::send(const QString &message)
     return false;
 }
 
-QString SocketManager::receive()
+void SocketManager::receive(const QString &message)
 {
-    if (isServerMode && server)
-    {
-        return server->receiveMessage();
-    }
-    else if (!isServerMode && client)
-    {
-        return client->receiveMessage();
-    }
-    return "";
+    qDebug() << "** message to widget, what ?=" << message;
+    
+    // QString rMessage = "";
+    // if (isServerMode && server)
+    // {
+    //     rMessage = server->receiveMessage();
+    // }
+    // else if (!isServerMode && client)
+    // {
+    //     rMessage = client->receiveMessage();
+    // }
+    
+    emit receiveMessageToLog(message);
 }
 
 void SocketManager::addClientToServer(QTcpSocket *clientSocket)

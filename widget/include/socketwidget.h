@@ -22,6 +22,14 @@
 #include "manager/include/socketmanager.h"
 #include "communicationenum.h"
 
+struct ClientInfo
+{
+    QString ipAddress;
+    QDateTime connectTime;
+    QLabel *timeLabel;
+    QTimer *timer;
+};
+
 class SocketWidget : public QWidget
 {
     Q_OBJECT
@@ -29,20 +37,9 @@ class SocketWidget : public QWidget
 public:
     explicit SocketWidget(QWidget *parent = 0);
     ~SocketWidget();
-    
-    struct ClientInfo
-    {
-        QString ipAddress;
-        QDateTime connectTime;
-        QLabel *timeLabel;
-        QTimer *timer;
-    };
 
-    // void addClient(const QString &ip, const QDateTime &connectTime);
     void setupServer(int port);
     void setupClient(const QString &ip, int port);
-    void sendMessage(const QString &message);
-    void receiveMessage();
 
 signals:
     void connected();
@@ -52,8 +49,9 @@ signals:
     void messageSent(QString);
 
 public slots:
-    // void updateClientList(QString clientAddress);
     void addClient(const QString &ip, const QDateTime &connectTime);
+    void sendMessage();
+    void receiveMessage(const QString &message);
 
 private slots:
     void onOptionButtonClicked();
@@ -66,9 +64,13 @@ private:
     void createOptionLayout(QGridLayout *parentLayout);
     void createClientsView(QGridLayout *parentLayout);
     void createFrameBox();
+    void createSendDataLayout(QGridLayout *parentLayout);
+    void createDataLayout(QGridLayout *parentLayout);
     
     int resizeWidthForEdit(QLineEdit *lineEdit, Communication::Socket::ConnectOption option);
     void testFunction();
+    int autoLayoutRowCount();
+    void logClear();
     
 private:
     SocketManager *socketManager;
@@ -84,11 +86,17 @@ private:
     QLineEdit *ipEdit;
     QLineEdit *portEdit;
     QPushButton *optionPushButton;
+    
     QPushButton *connectButton;
     QPushButton *disconnectButton;
-    QLineEdit *messageEdit;
+
+    QTextEdit *sendDataView;
+    QLabel *sendDataViewLabel;
     QPushButton *sendButton;
-    QTextEdit *messageView;
+    
+    QTextEdit *dataView;
+    QLabel *dataViewLabel;
+    QPushButton *logClearButton;
 
     int m_nCurrentTab = Communication::Socket::ConnectOption::Server;
     int m_nLayoutRow = 0;
@@ -109,7 +117,6 @@ private:
     QList<ClientInfo> clients;
     
     
-    QFrame *frame;
 };
 
 #endif // SOCKETWIDGET_H

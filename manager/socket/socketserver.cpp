@@ -65,10 +65,13 @@ void SocketServer::handleNewConnection()
 void SocketServer::readClientData()
 {
     QTcpSocket *client = qobject_cast<QTcpSocket*>(sender());
+    m_sLastReceived = "";
     if (client)
     {
-        lastReceivedMessage = QString::fromUtf8(client->readAll()).trimmed();
-        qDebug() << "Received from client:" << lastReceivedMessage;
+        m_sLastReceived = QString::fromUtf8(client->readAll()).trimmed();
+        qDebug() << "Received from client:" << m_sLastReceived;
+        
+        emit notifyReceiveToManager(m_sLastReceived);
     }
 }
 
@@ -98,8 +101,8 @@ bool SocketServer::sendMessage(const QString &message)
 
 QString SocketServer::receiveMessage()
 {
-    // 마지막으로 수신된 메시지 반환 (비동기 처리 후 저장된 값)
-    QString received = lastReceivedMessage;
-    lastReceivedMessage.clear(); // 한 번 읽으면 초기화
-    return received;
+//    // 마지막으로 수신된 메시지 반환 (비동기 처리 후 저장된 값)
+//    QString received = m_slastReceivedMessage;
+//    m_slastReceivedMessage.clear(); // 한 번 읽으면 초기화
+//    return received;
 }

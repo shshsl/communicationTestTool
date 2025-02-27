@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
     QString osType = QSysInfo::kernelType();
     QString osVersion = QSysInfo::kernelVersion();
     qDebug() << "Current OS :   " << osName;
-    qDebug() << "OS Type     :   " << osType;
+    qDebug() << "OS Type    :   " << osType;
     qDebug() << "OS Version :   " << osVersion;
 
     QTabWidget tabWidget;
