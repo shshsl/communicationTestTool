@@ -60,8 +60,8 @@ private slots:
     void updateElapsedTime();
 
 private:
-    SocketManager *socketManager;
-    
+    void setupConnections();
+    void clearConnections();
     void createTabWidget(QGridLayout *parentLayout);
     void createOptionLayout(QGridLayout *parentLayout);
     void createClientsView(QGridLayout *parentLayout);
@@ -71,6 +71,8 @@ private:
     void testFunction();
     
 private:
+    SocketManager *socketManager;
+    
     QTabWidget *socketTabWidget;
     QWidget *serverTab;
     QWidget *clientTab;

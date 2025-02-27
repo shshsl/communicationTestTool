@@ -38,6 +38,8 @@ signals:
     void sendData(const QString &data);
 
 private:
+    void setupConnections();
+    void clearConnections();
     void createComboBoxLayout(QVBoxLayout *parentLayout, const QString &labelText, QComboBox *&comboBox, const QStringList &items, const QString &defaultItem = "");
     void createDataInputLayout(QGridLayout *parentLayout, QLineEdit *&lineEdit, const int row = 0);
     void populateAvailablePorts();

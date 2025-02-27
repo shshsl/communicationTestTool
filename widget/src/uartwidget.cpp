@@ -88,8 +88,23 @@ UartWidget::UartWidget(QWidget *parent)
    for (QPushButton *button : sendButtons) {
       button->setEnabled(false);
    }
+   
+   optionGroupBox->setLayout(optionGroupLayout);
+   setupConnections();
+   populateAvailablePorts();
+}
 
-   // coonect signal/slot
+UartWidget::~UartWidget()
+{
+   clearConnections();
+   if (this->layout() != nullptr) {
+      delete this->layout();
+   }
+   delete uartManager;
+}
+
+void UartWidget::setupConnections()
+{
    // widget
    connect(openButton, &QPushButton::clicked, this, &UartWidget::handleOpenButtonClicked);
    connect(closeButton, &QPushButton::clicked, this, &UartWidget::handleCloseButtonClicked);
@@ -107,12 +122,9 @@ UartWidget::UartWidget(QWidget *parent)
    connect(uartManager, &UartManager::portOpened, this, &UartWidget::handlePortStateChanged);
    connect(uartManager, &UartManager::portClosed, this, &UartWidget::handlePortStateChanged);
    connect(uartManager, &UartManager::portFailedToOpen, this, &UartWidget::handlePortStateChanged);
-
-   optionGroupBox->setLayout(optionGroupLayout);
-   populateAvailablePorts();
 }
 
-UartWidget::~UartWidget()
+void UartWidget::clearConnections()
 {
    // widget
    disconnect(openButton, &QPushButton::clicked, this, &UartWidget::handleOpenButtonClicked);
@@ -123,11 +135,6 @@ UartWidget::~UartWidget()
    disconnect(uartManager, &UartManager::portOpened, this, &UartWidget::handlePortStateChanged);
    disconnect(uartManager, &UartManager::portClosed, this, &UartWidget::handlePortStateChanged);
    disconnect(uartManager, &UartManager::portFailedToOpen, this, &UartWidget::handlePortStateChanged);
-   
-   if (this->layout() != nullptr) {
-      delete this->layout();
-   }
-   delete uartManager;
 }
 
 // [option] ComboBox common layout

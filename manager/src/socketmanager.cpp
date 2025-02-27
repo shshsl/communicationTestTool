@@ -85,7 +85,14 @@ void SocketManager::addClientToServer(QTcpSocket *clientSocket)
     }
     else
     {
-        convertStr = clientAddr.toString();
+        if (clientAddr.toString().startsWith("::ffff:"))
+        {
+            convertStr = clientAddr.toString().mid(7); // remove - "::ffff:"
+        }
+        else
+        {
+            convertStr = clientAddr.toString(); // IPv6 Address
+        }
     }
     qDebug() << "** add a client :  " << convertStr;
 

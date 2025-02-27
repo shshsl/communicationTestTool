@@ -15,8 +15,22 @@ SocketWidget::SocketWidget(QWidget *parent)
     createClientsView(serverLayout);
     createOptionLayout(clientLayout);
 
+    setupConnections();
+}
+
+SocketWidget::~SocketWidget()
+{
+    clearConnections();
+    if (this->layout() != nullptr) {
+        delete this->layout();
+    }
+    delete socketManager;
+}
+
+void SocketWidget::setupConnections()
+{
     connect(socketManager, &SocketManager::addClientView, this, &SocketWidget::addClient);
-    QObject::connect(socketTabWidget, &QTabWidget::currentChanged, [=]() {
+    connect(socketTabWidget, &QTabWidget::currentChanged, [=]() {
         int currentTab = socketTabWidget->currentIndex();
         QString pButton = "";
         switch (currentTab)
@@ -42,12 +56,10 @@ SocketWidget::SocketWidget(QWidget *parent)
     });
 }
 
-SocketWidget::~SocketWidget()
+void SocketWidget::clearConnections()
 {
-    if (this->layout() != nullptr) {
-        delete this->layout();
-    }
-    delete socketManager;
+    disconnect(socketManager, &SocketManager::addClientView, this, &SocketWidget::addClient);
+    disconnect(socketTabWidget, &QTabWidget::currentChanged, this, nullptr);
 }
 
 void SocketWidget::createTabWidget(QGridLayout *parentLayout)
@@ -105,9 +117,10 @@ void SocketWidget::createOptionLayout(QGridLayout *parentLayout)
 
 void SocketWidget::createClientsView(QGridLayout *parentLayout)
 {
-    // 기존 clientsListView와 model 정리
-    if (clientsListView) {
-        for (ClientInfo &client : clients) {
+    if (clientsListView)
+    {
+        for (ClientInfo &client : clients)
+        {
             client.timer->stop();
             delete client.timer;
         }
@@ -115,15 +128,11 @@ void SocketWidget::createClientsView(QGridLayout *parentLayout)
         delete clientsListView;
         delete clientsModel;
     }
-
-    // QListView와 모델 생성
     clientsListView = new QListView(this);
     clientsModel = new QStandardItemModel(this);
     clientsListView->setModel(clientsModel);
-
-    // 리스트 뷰 설정
-    clientsListView->setFlow(QListView::LeftToRight);   // 좌->우 흐름 설정
-    clientsListView->setWrapping(false);                // 줄 바꿈 비활성화
+    clientsListView->setFlow(QListView::LeftToRight);
+    clientsListView->setWrapping(false);
     clientsListView->setResizeMode(QListView::Adjust);  // 항목 크기에 맞춰 조정
     clientsListView->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded); // 수평 스크롤바 필요 시 표시
     clientsListView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);  // 수직 스크롤바 비활성화
@@ -139,21 +148,17 @@ void SocketWidget::createClientsView(QGridLayout *parentLayout)
 
 void SocketWidget::addClient(const QString &ip, const QDateTime &connectTime)
 {
-    qDebug() << "widget - addClient !! " << ip << " , " << connectTime;
-    
-    // clientsModel이 null일 경우 초기화
-    if (!clientsModel) {
+    if (!clientsModel)
+    {
         qDebug() << "Error: clientsModel is null!";
         clientsModel = new QStandardItemModel(this);
         clientsListView->setModel(clientsModel);
     }
     
-    // ClientInfo 객체 생성
     ClientInfo client;
     client.ipAddress = ip;
     client.connectTime = connectTime;
 
-    // 클라이언트 위젯 생성
     QWidget *clientWidget = new QWidget();
     QVBoxLayout *layout = new QVBoxLayout(clientWidget);
     QLabel *ipLabel = new QLabel("🖥️ IP : " + ip, clientWidget);
@@ -166,6 +171,7 @@ void SocketWidget::addClient(const QString &ip, const QDateTime &connectTime)
     layout->addWidget(client.timeLabel);
     layout->setContentsMargins(5, 5, 5, 5);
 
+    // add a item to listview.
     QStandardItem *item = new QStandardItem("\u200B"); // Zero Width Space (U+200B)
     item->setSizeHint(QSize(150, 50)); // 원하는 크기로 고정
     clientsModel->appendRow(item);
@@ -173,12 +179,11 @@ void SocketWidget::addClient(const QString &ip, const QDateTime &connectTime)
     clientsListView->setIndexWidget(index, clientWidget);
     qDebug() << "Added client IP:" << ip << "at row:" << index.row();
 
-    // 타이머 설정
+    // set timer
     client.timer = new QTimer(this);
     connect(client.timer, &QTimer::timeout, this, &SocketWidget::updateElapsedTime);
     client.timer->start(1000);
 
-    // 클라이언트 리스트에 추가
     clients.append(client);
     updateElapsedTime();
 }
