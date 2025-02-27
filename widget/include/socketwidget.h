@@ -88,7 +88,7 @@ private:
     QPushButton *sendButton;
     QTextEdit *messageView;
 
-    int m_nCurrentTab = Communication::Socket::ConnectOption::None;
+    int m_nCurrentTab = Communication::Socket::ConnectOption::Server;
     int m_nLayoutRow = 0;
     int m_nLayoutColumn = 0;
     
