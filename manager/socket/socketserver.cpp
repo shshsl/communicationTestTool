@@ -1,6 +1,8 @@
 #include "socketserver.h"
 #include <QDebug>
 
+#define MAX_USER_COUNT  10
+
 SocketServer::SocketServer(QObject *parent) : QObject(parent),
     tcpServer(new QTcpServer(this))
 {
@@ -40,6 +42,15 @@ void SocketServer::testFunction()
 
 void SocketServer::handleNewConnection()
 {
+    if (clients.size() >= MAX_USER_COUNT)
+    {
+        QTcpSocket *clientSocket = tcpServer->nextPendingConnection();
+        clientSocket->disconnectFromHost();
+        clientSocket->deleteLater();
+        qDebug() << "Connection rejected: Maximum client limit (10) reached";
+        return;
+    }
+    
     QTcpSocket *clientSocket = tcpServer->nextPendingConnection();
     clients.append(clientSocket);
     connect(clientSocket, &QTcpSocket::readyRead, this, &SocketServer::readClientData);
