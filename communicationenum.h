@@ -14,9 +14,9 @@ namespace Communication
     public:
         enum SerialPortState
         {
-            SERIAL_PORT_NONE = 0,
-            SERIAL_PORT_OPEN = 1,
-            SERIAL_PORT_CLOSE = 2,
+            None = 0,
+            Open = 1,
+            Close = 2,
         };
     };
     
