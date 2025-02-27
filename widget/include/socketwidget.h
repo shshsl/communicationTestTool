@@ -15,6 +15,9 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QHostAddress> // IP 유효성 검사에 사용
+#include <QScrollArea>
+#include <QListView>
+#include <QStandardItemModel>
 
 #include "manager/include/socketmanager.h"
 #include "communicationenum.h"
@@ -26,6 +29,14 @@ class SocketWidget : public QWidget
 public:
     explicit SocketWidget(QWidget *parent = 0);
     ~SocketWidget();
+    
+    struct ClientInfo
+    {
+        QString ipAddress;
+        QDateTime connectTime;
+        QLabel *timeLabel;
+        QTimer *timer;
+    };
 
     // void addClient(const QString &ip, const QDateTime &connectTime);
     void setupServer(int port);
@@ -77,7 +88,7 @@ private:
     QPushButton *sendButton;
     QTextEdit *messageView;
 
-    int m_nCurrentTab = 0;
+    int m_nCurrentTab = Communication::Socket::ConnectOption::None;
     int m_nLayoutRow = 0;
     int m_nLayoutColumn = 0;
     
@@ -86,17 +97,15 @@ private:
     QLabel *timeLabel;
     QDateTime startTime;
     QTimer *timer;
-    
-    struct ClientInfo
-    {
-        QString ipAddress;
-        QDateTime connectTime;
-        QLabel *timeLabel; // 실시간 업데이트를 위한 라벨
-        QTimer *timer;     // 클라이언트별 타이머
-    };
-
+    //layout
     QHBoxLayout *clientsLayout;
+    QScrollArea *scrollArea;
+    QWidget *scrollContent;
+    //listview
+    QListView *clientsListView;
+    QStandardItemModel *clientsModel;
     QList<ClientInfo> clients;
+    
     
     QFrame *frame;
 };

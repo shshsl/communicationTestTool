@@ -1,8 +1,9 @@
 #include "widget/include/socketwidget.h"
 
 SocketWidget::SocketWidget(QWidget *parent) 
-    : QWidget(parent), socketManager(new SocketManager(this)),
-    m_nLayoutRow(0), m_nLayoutColumn(0), clientsLayout(nullptr), socketTabWidget(new QTabWidget(this))
+    : QWidget(parent), socketManager(new SocketManager(this))
+    , m_nLayoutRow(0), m_nLayoutColumn(0), clientsLayout(nullptr), socketTabWidget(new QTabWidget(this))
+    , clientsListView(nullptr), clientsModel(nullptr)
 {
     // UI 생성
     QGridLayout *layout = new QGridLayout(this);
@@ -17,18 +18,19 @@ SocketWidget::SocketWidget(QWidget *parent)
     connect(socketManager, &SocketManager::addClientView, this, &SocketWidget::addClient);
     QObject::connect(socketTabWidget, &QTabWidget::currentChanged, [=]() {
         int currentTab = socketTabWidget->currentIndex();
-        // label->setText("current tab: " + QString::number(currentTab));
-        m_nCurrentTab = currentTab;
         QString pButton = "";
         switch (currentTab)
         {
         case 0:
+            m_nCurrentTab = Communication::Socket::ConnectOption::Server;
             pButton = "Start";
             break;
         case 1:
+            m_nCurrentTab = Communication::Socket::ConnectOption::Client;
             pButton = "Connect";
             break;
         case 2:
+            m_nCurrentTab = Communication::Socket::ConnectOption::Udp;
             pButton = "UDP Server";
             break;
 
@@ -88,9 +90,8 @@ void SocketWidget::createOptionLayout(QGridLayout *parentLayout)
     boxLayout->addWidget(ipEdit);
     boxLayout->addWidget(portLabel);
     boxLayout->addWidget(portEdit);
-    boxLayout->addWidget(optionPushButton);
-    
-    boxLayout->addStretch(); // or>> boxLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
+    boxLayout->addWidget(optionPushButton);    
+    boxLayout->addStretch();
     parentLayout->addLayout(boxLayout, m_nLayoutRow, 0);
     
     connect(ipEdit, &QLineEdit::textChanged, this, [](const QString &text) {
@@ -104,76 +105,93 @@ void SocketWidget::createOptionLayout(QGridLayout *parentLayout)
 
 void SocketWidget::createClientsView(QGridLayout *parentLayout)
 {
-    // 기존 clientsLayout 정리
-    if (clientsLayout) {
-        QLayoutItem *item;
-        while ((item = clientsLayout->takeAt(0)) != nullptr) {
-            delete item->widget();
-            delete item;
-        }
-        delete clientsLayout;
-
+    // 기존 clientsListView와 model 정리
+    if (clientsListView) {
         for (ClientInfo &client : clients) {
             client.timer->stop();
             delete client.timer;
         }
         clients.clear();
+        delete clientsListView;
+        delete clientsModel;
     }
 
-    // 새로운 가로 레이아웃 생성
-    clientsLayout = new QHBoxLayout();
-    clientsLayout->setSpacing(10); // 클라이언트 간 간격
-    clientsLayout->addStretch();   // 오른쪽 여백 추가
+    // QListView와 모델 생성
+    clientsListView = new QListView(this);
+    clientsModel = new QStandardItemModel(this);
+    clientsListView->setModel(clientsModel);
 
-    // testFunction();  //for test - (25.2.26)
+    // 리스트 뷰 설정
+    clientsListView->setFlow(QListView::LeftToRight);   // 좌->우 흐름 설정
+    clientsListView->setWrapping(false);                // 줄 바꿈 비활성화
+    clientsListView->setResizeMode(QListView::Adjust);  // 항목 크기에 맞춰 조정
+    clientsListView->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded); // 수평 스크롤바 필요 시 표시
+    clientsListView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);  // 수직 스크롤바 비활성화
+    clientsListView->setSpacing(3); // 항목 사이 간격 설정
+    clientsListView->setMinimumSize(100, 50); // 최소 크기 설정
+    clientsListView->setFixedHeight(80);
+    clientsListView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     
-    // QGridLayout에 clientsLayout 추가
-    parentLayout->addLayout(clientsLayout, m_nLayoutRow + 1, 0); // 탭 아래에 배치 (행 조정 가능)
+    // testFunction();
+
+    parentLayout->addWidget(clientsListView, m_nLayoutRow + 1, 0, 1, 1, Qt::AlignTop);
 }
 
 void SocketWidget::addClient(const QString &ip, const QDateTime &connectTime)
 {
-    // 클라이언트 정보 생성
+    qDebug() << "widget - addClient !! " << ip << " , " << connectTime;
+    
+    // clientsModel이 null일 경우 초기화
+    if (!clientsModel) {
+        qDebug() << "Error: clientsModel is null!";
+        clientsModel = new QStandardItemModel(this);
+        clientsListView->setModel(clientsModel);
+    }
+    
+    // ClientInfo 객체 생성
     ClientInfo client;
     client.ipAddress = ip;
     client.connectTime = connectTime;
 
-    createFrameBox();
-
-    // 클라이언트 위젯 생성 및 레이아웃 설정
-    QWidget *clientsViewWidget = new QWidget(frame); // frame을 부모로 설정
-    QVBoxLayout *layout = new QVBoxLayout(clientsViewWidget);
-    QLabel *ipLabel = new QLabel("🖥️ IP : " + ip, clientsViewWidget);
-    client.timeLabel = new QLabel("Time : 00:00:00", clientsViewWidget);
+    // 클라이언트 위젯 생성
+    QWidget *clientWidget = new QWidget();
+    QVBoxLayout *layout = new QVBoxLayout(clientWidget);
+    QLabel *ipLabel = new QLabel("🖥️ IP : " + ip, clientWidget);
+    client.timeLabel = new QLabel("Time : 00:00:00", clientWidget);
+    
+    ipLabel->setAlignment(Qt::AlignCenter);
+    client.timeLabel->setAlignment(Qt::AlignCenter);
 
     layout->addWidget(ipLabel);
     layout->addWidget(client.timeLabel);
     layout->setContentsMargins(5, 5, 5, 5);
 
-    // QFrame에 clientsWidget 추가
-    QVBoxLayout *frameLayout = new QVBoxLayout(frame);
-    frameLayout->addWidget(clientsViewWidget);
-    frameLayout->setContentsMargins(0, 0, 0, 0); // 프레임 내부 여백 제거 (필요 시 조정)
+    QStandardItem *item = new QStandardItem("\u200B"); // Zero Width Space (U+200B)
+    item->setSizeHint(QSize(150, 50)); // 원하는 크기로 고정
+    clientsModel->appendRow(item);
+    QModelIndex index = clientsModel->index(clientsModel->rowCount() - 1, 0);
+    clientsListView->setIndexWidget(index, clientWidget);
+    qDebug() << "Added client IP:" << ip << "at row:" << index.row();
 
     // 타이머 설정
     client.timer = new QTimer(this);
     connect(client.timer, &QTimer::timeout, this, &SocketWidget::updateElapsedTime);
-    client.timer->start(1000); // 1초 간격
+    client.timer->start(1000);
 
-    // 클라이언트 목록에 추가
+    // 클라이언트 리스트에 추가
     clients.append(client);
-    clientsLayout->insertWidget(clientsLayout->count() - 1, frame); // frame을 추가
-
-    // 초기 시간 업데이트
     updateElapsedTime();
 }
 
 void SocketWidget::updateElapsedTime()
 {
-    for (ClientInfo &client : clients) {
-        qint64 seconds = client.connectTime.secsTo(QDateTime::currentDateTime());
-        QTime elapsedTime = QTime(0, 0).addSecs(seconds);
-        client.timeLabel->setText("Time: " + elapsedTime.toString("hh:mm:ss"));
+    for (ClientInfo &client : clients)
+    {
+        QDateTime now = QDateTime::currentDateTime();
+        qint64 seconds = client.connectTime.secsTo(now);
+        QTime time(0, 0, 0);
+        time = time.addSecs(seconds);
+        client.timeLabel->setText("Time : " + time.toString("hh:mm:ss"));
     }
 }
 
@@ -191,10 +209,10 @@ int SocketWidget::resizeWidthForEdit(QLineEdit *lineEdit, Communication::Socket:
     QString optionStr = "";
     switch (option)
     {
-    case Communication::Socket::ConnectOption::IP_ADDRESS:
+    case Communication::Socket::ConnectOption::IpAddress:
         optionStr = "255.255.255.255";
         break;
-    case Communication::Socket::ConnectOption::PORT:
+    case Communication::Socket::ConnectOption::Port:
         optionStr = "65535";
         break;
     
@@ -217,13 +235,17 @@ int SocketWidget::resizeWidthForEdit(QLineEdit *lineEdit, Communication::Socket:
 
 void SocketWidget::testFunction()
 {
-    // 기본값 설정
+    // createOptionLayout : 기본값 설정 
     ipEdit->setText("172.30.1.43");  // 테스트용 기본 IP
     portEdit->setText("8080");       // 테스트용 기본 포트
     
     // 예시 클라이언트 추가 (테스트용)
     // addClient("192.168.1.1", QDateTime::currentDateTime());
     // addClient("172.30.1.43", QDateTime::currentDateTime().addSecs(-3600)); // 1시간 전
+    
+    // // createClientsView : 테스트 list 항목 추가
+    // QStandardItem *testItem = new QStandardItem("Test Client");
+    // clientsModel->appendRow(testItem);
 }
 
 void SocketWidget::setupServer(int port)
@@ -270,7 +292,7 @@ void SocketWidget::onOptionButtonClicked()
 
     qDebug() << "IP: " << ip << " | Port: " << portText;
 
-    if (m_nCurrentTab == 0) // 서버
+    if (m_nCurrentTab == Communication::Socket::ConnectOption::Server)
     {
         if (ok && port >= 1025 && port <= 65535)
         {
@@ -281,7 +303,7 @@ void SocketWidget::onOptionButtonClicked()
             qDebug() << "[Server] Invalid port! Enter a number between 1025 and 65535.";
         }
     }
-    else if (m_nCurrentTab == 1) // 클라이언트
+    else if (m_nCurrentTab == Communication::Socket::ConnectOption::Client)
     {
         QHostAddress address(ip);
         if (!ip.isEmpty() && !address.isNull() && ok && port >= 1025 && port <= 65535)

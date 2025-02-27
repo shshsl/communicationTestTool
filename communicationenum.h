@@ -28,9 +28,12 @@ namespace Communication
     public:
         enum ConnectOption
         {
-            OPTION_NONE = 0,
-            IP_ADDRESS = 1,
-            PORT = 2,
+            None = 0,
+            Server,
+            Client,
+            Udp,
+            IpAddress,
+            Port,
         };
     };
 }
