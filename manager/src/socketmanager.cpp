@@ -17,7 +17,9 @@ bool SocketManager::startAsServer(int port)
 {
     server = new SocketServer();
     isServerMode = true;
-   return server->startServer(port);
+    connect(server, &SocketServer::newClientConnected, this, &SocketManager::addClientToServer);
+    
+    return server->startServer(port);
 }
 
 void SocketManager::stopServer()
@@ -70,4 +72,28 @@ QString SocketManager::receive()
         return client->receiveMessage();
     }
     return "";
+}
+
+void SocketManager::addClientToServer(QTcpSocket *clientSocket)
+{
+    clients.append(clientSocket);
+    QHostAddress clientAddr = clientSocket->peerAddress();
+    QString convertStr = "";
+    if (clientAddr.protocol() == QAbstractSocket::IPv4Protocol)
+    {
+        convertStr = QHostAddress(clientAddr.toIPv4Address()).toString();
+    }
+    else
+    {
+        convertStr = clientAddr.toString();
+    }
+    qDebug() << "** add a client :  " << convertStr;
+
+    connect(clientSocket, &QTcpSocket::disconnected, this, [this, clientSocket]() {
+        clients.removeOne(clientSocket);
+        clientSocket->deleteLater();
+        qDebug() << "** remove a client.";
+    });
+
+    emit addClientView(convertStr, QDateTime::currentDateTime());
 }

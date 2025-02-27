@@ -14,7 +14,7 @@ SocketWidget::SocketWidget(QWidget *parent)
     createClientsView(serverLayout);
     createOptionLayout(clientLayout);
 
-//    connect(socketManager, &SocketManager::newClientConnected, socketWidget, &SocketWidget::addClient);
+    connect(socketManager, &SocketManager::addClientView, this, &SocketWidget::addClient);
     QObject::connect(socketTabWidget, &QTabWidget::currentChanged, [=]() {
         int currentTab = socketTabWidget->currentIndex();
         // label->setText("current tab: " + QString::number(currentTab));

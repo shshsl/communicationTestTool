@@ -27,7 +27,7 @@ public:
     explicit SocketWidget(QWidget *parent = 0);
     ~SocketWidget();
 
-    void addClient(const QString &ip, const QDateTime &connectTime);
+    // void addClient(const QString &ip, const QDateTime &connectTime);
     void setupServer(int port);
     void setupClient(const QString &ip, int port);
     void sendMessage(const QString &message);
@@ -41,6 +41,8 @@ signals:
     void messageSent(QString);
 
 public slots:
+    // void updateClientList(QString clientAddress);
+    void addClient(const QString &ip, const QDateTime &connectTime);
 
 private slots:
     void onOptionButtonClicked();

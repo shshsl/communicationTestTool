@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QDebug>
+#include <QDateTime>
 
 #include "communicationenum.h"
 
@@ -30,13 +31,16 @@ public:
     QString receive();
 
 signals:
+    void addClientView(QString clientAddress, QDateTime connectTime);
 
 public slots:
+    void addClientToServer(QTcpSocket *clientSocket);
 
 private:
     SocketServer* server;
     SocketClient* client;
     bool isServerMode;
+    QList<QTcpSocket*> clients;
     
 };
 

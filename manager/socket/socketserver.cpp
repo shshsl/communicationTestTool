@@ -5,11 +5,6 @@ SocketServer::SocketServer(QObject *parent) : QObject(parent),
     tcpServer(new QTcpServer(this))
 {
     connect(tcpServer, &QTcpServer::newConnection, this, &SocketServer::handleNewConnection);
-    
-    if (!tcpServer->listen(QHostAddress::Any, 8080))
-    { // 포트 12345 예시
-        qDebug() << "Server failed to start:" << tcpServer->errorString();
-    }
 }
 
 SocketServer::~SocketServer()
@@ -52,6 +47,7 @@ void SocketServer::handleNewConnection()
         clients.removeOne(clientSocket);
         clientSocket->deleteLater();
     });
+    emit newClientConnected(clientSocket);
     qDebug() << "New client connected";
 }
 

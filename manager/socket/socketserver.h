@@ -21,7 +21,7 @@ public:
     QString receiveMessage();
 
 signals:
-    void newClientConnected(QString &clientIp, QDateTime &connectTime);
+    void newClientConnected(QTcpSocket *clientSocket);
 
 private slots:
     void handleNewConnection();
