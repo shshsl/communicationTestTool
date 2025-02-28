@@ -41,8 +41,12 @@ void SocketWidget::setupConnections()
     connect(socketManager, &SocketManager::addClientView, this, &SocketWidget::addClient);
     connect(socketManager, &SocketManager::receiveMessageToLog, this, &SocketWidget::receiveMessage);
     connect(socketTabWidget, &QTabWidget::currentChanged, this, &SocketWidget::onTabChanged);
-    connect(sendButton, &QPushButton::clicked, this, &SocketWidget::sendMessage);
-    connect(logClearButton, &QPushButton::clicked, this, &SocketWidget::logClear);
+    connect(serverSendButton, &QPushButton::clicked, this, &SocketWidget::sendMessageToClient);
+    connect(serverLogClearButton, &QPushButton::clicked, this, &SocketWidget::logClear);
+    connect(clientSendButton, &QPushButton::clicked, this, &SocketWidget::sendMessageToServer);
+    connect(clientLogClearButton, &QPushButton::clicked, this, &SocketWidget::logClear);
+    
+    // connect(client, &SocketClient::messageReceived, this, &MainWindow::displayMessage);
 }
 
 void SocketWidget::clearConnections()
@@ -50,8 +54,10 @@ void SocketWidget::clearConnections()
     disconnect(socketManager, &SocketManager::addClientView, this, &SocketWidget::addClient);
     disconnect(socketManager, &SocketManager::receiveMessageToLog, this, &SocketWidget::receiveMessage);
     disconnect(socketTabWidget, &QTabWidget::currentChanged, this, &SocketWidget::onTabChanged);
-    disconnect(sendButton, &QPushButton::clicked, this, &SocketWidget::sendMessage);
-    disconnect(logClearButton, &QPushButton::clicked, this, &SocketWidget::logClear);
+    disconnect(serverSendButton, &QPushButton::clicked, this, &SocketWidget::sendMessageToClient);
+    disconnect(serverLogClearButton, &QPushButton::clicked, this, &SocketWidget::logClear);
+    disconnect(clientSendButton, &QPushButton::clicked, this, &SocketWidget::sendMessageToServer);
+    disconnect(clientLogClearButton, &QPushButton::clicked, this, &SocketWidget::logClear);
 }
 
 void SocketWidget::createTabWidget(QGridLayout *parentLayout)
@@ -144,32 +150,79 @@ void SocketWidget::createClientsView(QGridLayout *parentLayout)
 
 void SocketWidget::createSendDataLayout(QGridLayout *parentLayout)
 {
-    sendDataView = new QTextEdit(this);
-    sendDataView->setFixedHeight(80);
-    sendDataViewLabel = new QLabel("▶️ Send Data :");
-    sendDataView->setPlaceholderText("Send to Client(s)...");
+    sendDataViewLabel = new QLabel();
     sendDataViewLabel->setContentsMargins(0, 10, 0, 0);   //left, top, right, bottom
     parentLayout->addWidget(sendDataViewLabel, autoLayoutRowCount(), 0);
-    parentLayout->addWidget(sendDataView, autoLayoutRowCount(), 0);
-    
-    sendButton = new QPushButton("Send", this);
-    parentLayout->addWidget(sendButton, autoLayoutRowCount(), 0, Qt::AlignRight);
-    
+
+    if (parentLayout == clientLayout)
+    {
+        sendDataViewLabel->setText("▶️ Send Data - ( to Server ):");
+        clientSendView = new QTextEdit(this);
+        clientSendView->setFixedHeight(80);
+        clientSendView->setPlaceholderText("Send to Server...");
+        parentLayout->addWidget(clientSendView, autoLayoutRowCount(), 0);
+        
+        clientSendButton = new QPushButton("Send", this);
+        parentLayout->addWidget(clientSendButton, autoLayoutRowCount(), 0, Qt::AlignRight);
+    }
+    else
+    {
+        sendDataViewLabel->setText("▶️ Send Data - ( to Client(s) ):");
+        serverSendView = new QTextEdit(this);
+        serverSendView->setFixedHeight(80);
+        serverSendView->setPlaceholderText("Send to Client(s)...");
+        parentLayout->addWidget(serverSendView, autoLayoutRowCount(), 0);
+        
+        serverSendButton = new QPushButton("Send", this);
+        parentLayout->addWidget(serverSendButton, autoLayoutRowCount(), 0, Qt::AlignRight);
+    }
 }
 
 void SocketWidget::createDataLayout(QGridLayout *parentLayout)
 {
-    dataViewLabel = new QLabel("▶️ Receive Data :");
+    dataViewLabel = new QLabel();
     dataViewLabel->setContentsMargins(0, 10, 0, 0);       //left, top, right, bottom
-    dataView = new QTextEdit(this);
-    dataView->setReadOnly(true);
-    dataView->setPlaceholderText("...");
     parentLayout->addWidget(dataViewLabel, autoLayoutRowCount(), 0);
-    parentLayout->addWidget(dataView, autoLayoutRowCount(), 0);
+
+    if (parentLayout == clientLayout)
+    {
+        dataViewLabel->setText("▶️ Receive Data - ( from Server ):");
+        clientDataView = new QTextEdit(this);
+        clientDataView->setEnabled(true);
+        clientDataView->setReadOnly(false);
+        clientDataView->setPlaceholderText("...");
+        parentLayout->addWidget(clientDataView, autoLayoutRowCount(), 0);
+    }
+    else
+    {
+        dataViewLabel->setText("▶️ Receive Data - ( from Client(s) ):");
+        serverDataView = new QTextEdit(this);
+        serverDataView->setEnabled(true);
+        serverDataView->setReadOnly(false);
+        serverDataView->setPlaceholderText("...");
+        parentLayout->addWidget(serverDataView, autoLayoutRowCount(), 0);
+    }
     
-    logClearButton = new QPushButton("Log Clear", this);
-    logClearButton->setFixedSize(100, 25);
-    parentLayout->addWidget(logClearButton, autoLayoutRowCount(), 0, Qt::AlignRight);
+    serverLogClearButton;
+    if (parentLayout == clientLayout)
+    {
+        clientLogClearButton = new QPushButton("Log Clear", this);
+        clientLogClearButton->setFixedSize(100, 25);
+        parentLayout->addWidget(clientLogClearButton, autoLayoutRowCount(), 0, Qt::AlignRight);
+    }
+    else
+    {
+        serverLogClearButton = new QPushButton("Log Clear", this);
+        serverLogClearButton->setFixedSize(100, 25);
+        parentLayout->addWidget(serverLogClearButton, autoLayoutRowCount(), 0, Qt::AlignRight);
+    }
+    
+    
+    // dataView->append("test message");
+    
+    qDebug() << "parentLayout parent:" << parentLayout->parent();
+    // qDebug() << "dataView visible:" << dataView->isVisible();
+    // qDebug() << "dataView geometry:" << dataView->geometry();
 }
 
 void SocketWidget::addClient(const QString &ip, const QDateTime &connectTime)
@@ -293,16 +346,60 @@ void SocketWidget::setupClient(const QString &ip, int port)
    }
 }
 
-void SocketWidget::sendMessage()
+void SocketWidget::sendMessageToServer()
 {
-    QString message = sendDataView->toPlainText().trimmed();
+    qDebug() << "Send check To Server !!";
     
+    // qDebug() << "serverSendButton" << serverSendButton;
+    // qDebug() << "clientSendButton" << clientSendButton;
+    if(!serverSendButton || !clientSendButton)
+    {
+        return ;
+    }
+    
+    qDebug() << "client - SendButton ---------------------------------";
+    QString message = clientSendView->toPlainText().trimmed();
+
+    qDebug() << "client - SendButton ************************ ";
     if (!message.isEmpty())
     {
         if (socketManager->send(message))
         {
             qDebug() << "Sent: " << message;
-            sendDataView->clear();  //remove text after send.
+            clientSendView->clear();
+            clientDataView->append(message);
+        }
+        else
+        {
+            qDebug() << "Failed to send: " << message;
+        }
+    }
+    else
+    {
+        qDebug() << "No message to send!";
+    }
+    qDebug() << "client - SendButton ==================================== ";
+}
+
+void SocketWidget::sendMessageToClient()
+{
+    // qDebug() << "serverSendButton" << serverSendButton;
+    // qDebug() << "clientSendButton" << clientSendButton;
+    if(!serverSendButton || !clientSendButton)
+    {
+        return ;
+    }
+
+    QString message = serverSendView->toPlainText().trimmed();
+    if (!message.isEmpty())
+    {
+        if (socketManager->send(message))
+        {
+            qDebug() << "Sent: " << message;
+            serverSendView->clear();
+            timestamp = QDateTime::currentDateTime().toString("[yyyy/MM/dd] [HH:mm:ss] ");
+            formattedMessage = QStringLiteral("%1[client]: %2").arg(timestamp, message);
+            QMetaObject::invokeMethod(clientDataView, "append", Qt::QueuedConnection, Q_ARG(QString, formattedMessage));
         }
         else
         {
@@ -315,18 +412,33 @@ void SocketWidget::sendMessage()
     }
 }
 
-void SocketWidget::receiveMessage(const QString &message)
+void SocketWidget::receiveMessage(bool isClient, const QString &message)
 {
-    if (message != "")
+    qDebug() << "isClient ?= " << isClient;
+    qDebug() << "Received ?= " << message;
+    
+    QString timestamp = "";
+    QString formattedMessage = "";
+    if (isClient)
     {
-        qDebug() << "Received: " << message;
-        dataView->append(message);
-        dataView->ensureCursorVisible();
+        timestamp = QDateTime::currentDateTime().toString("[yyyy/MM/dd] [HH:mm:ss] ");
+        formattedMessage = QStringLiteral("%1[client]: %2").arg(timestamp, message);
+        QMetaObject::invokeMethod(serverDataView, "append", Qt::QueuedConnection, Q_ARG(QString, formattedMessage));
     }
     else
     {
-        qDebug() << "message is empty !!";
+        timestamp = QDateTime::currentDateTime().toString("[yyyy/MM/dd] [HH:mm:ss] ");
+        formattedMessage = QStringLiteral("%1[server]: %2").arg(timestamp, message);
+        QMetaObject::invokeMethod(clientDataView, "append", Qt::QueuedConnection, Q_ARG(QString, formattedMessage));
     }
+
+    // clientDataView->update();
+    // socketTabWidget->update();
+    // QApplication::processEvents();
+    
+    // qDebug() << "dataView type:" << dataView->metaObject()->className();
+    // qDebug() << "Current thread:" << QThread::currentThread();
+    // qDebug() << "GUI thread:" << QCoreApplication::instance()->thread();
 }
 
 void SocketWidget::onOptionButtonClicked()
@@ -398,7 +510,8 @@ int SocketWidget::autoLayoutRowCount()
 
 void SocketWidget::logClear()
 {
-    dataView->clear();
+    serverDataView->clear();
+    clientDataView->clear();
 }
 
 void SocketWidget::onTabChanged()
@@ -430,3 +543,4 @@ void SocketWidget::onTabChanged()
         optionPushButton->setText(pButton);
         qDebug() << "** Current Tab: " << tabName;
 }
+

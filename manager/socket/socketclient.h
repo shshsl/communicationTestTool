@@ -16,10 +16,14 @@ public:
     QString receiveMessage();
     int connectToServer(const QString &host, quint16 port);
 
+signals:
+    void messageReceived(bool, const QString &message);
+
 private slots:
     void onConnected();
     void onDisconnected();
     void readServerData();
+    // void onSocketError(QAbstractSocket::SocketError error);
 
 private:
     QTcpSocket *tcpSocket;

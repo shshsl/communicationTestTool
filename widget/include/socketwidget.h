@@ -19,6 +19,12 @@
 #include <QListView>
 #include <QStandardItemModel>
 
+//test  [[
+#include <QCoreApplication>
+#include <QThread>
+#include <QApplication>
+//  ]]
+
 #include "manager/include/socketmanager.h"
 #include "communicationenum.h"
 
@@ -50,8 +56,9 @@ signals:
 
 public slots:
     void addClient(const QString &ip, const QDateTime &connectTime);
-    void sendMessage();
-    void receiveMessage(const QString &message);
+    void sendMessageToServer();
+    void sendMessageToClient();
+    void receiveMessage(bool isClient, const QString &message);
 
 private slots:
     void onOptionButtonClicked();
@@ -91,13 +98,18 @@ private:
     QPushButton *connectButton;
     QPushButton *disconnectButton;
 
-    QTextEdit *sendDataView;
+    QTextEdit *serverSendView;
+    QTextEdit *serverDataView;
+    QTextEdit *clientSendView;
+    QTextEdit *clientDataView;
     QLabel *sendDataViewLabel;
-    QPushButton *sendButton;
-    
-    QTextEdit *dataView;
     QLabel *dataViewLabel;
-    QPushButton *logClearButton;
+    QPushButton *serverSendButton;
+    QPushButton *serverLogClearButton;
+    QPushButton *clientSendButton;
+    QPushButton *clientLogClearButton;
+    
+    // QTextEdit *dataView;
 
     int m_nCurrentTab = Communication::Socket::ConnectOption::Server;
     int m_nLayoutRow = 0;
@@ -116,7 +128,7 @@ private:
     QListView *clientsListView;
     QStandardItemModel *clientsModel;
     QList<ClientInfo> clients;
-    
+    QList<QTcpSocket*> clientss;
     
 };
 

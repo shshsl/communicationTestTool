@@ -6,10 +6,16 @@ SocketManager::SocketManager(QObject *parent) : QObject(parent),
     isServerMode(false)
 {
     // setupConnections();  // due to null paramter. / block.
+    // server.moveToThread(&workerThread);
+    // workerThread.start();
+    // connect(this, &SocketManager::startServerSignal, &server, &QTcpServer::listen);
 }
 
 SocketManager::~SocketManager()
 {
+    // workerThread.quit();
+    // workerThread.wait();
+    
     clearServerConnections();
     if (server) delete server;
     if (client) delete client;
@@ -19,12 +25,14 @@ void SocketManager::setupServerConnections()
 {
     connect(server, &SocketServer::newClientConnected, this, &SocketManager::addClientToServer);
     connect(server, &SocketServer::notifyReceiveToManager, this, &SocketManager::receive);
+    connect(client, &SocketClient::messageReceived, this, &SocketManager::receive);
 }
 
 void SocketManager::clearServerConnections()
 {
     disconnect(server, &SocketServer::newClientConnected, this, &SocketManager::addClientToServer);
     disconnect(server, &SocketServer::notifyReceiveToManager, this, &SocketManager::receive);
+    disconnect(client, &SocketClient::messageReceived, this, &SocketManager::receive);
 }
 
 bool SocketManager::startAsServer(int port)
@@ -77,7 +85,7 @@ bool SocketManager::send(const QString &message)
     return false;
 }
 
-void SocketManager::receive(const QString &message)
+void SocketManager::receive(bool isClient, const QString &message)
 {
     qDebug() << "** message to widget, what ?=" << message;
     
@@ -91,7 +99,7 @@ void SocketManager::receive(const QString &message)
     //     rMessage = client->receiveMessage();
     // }
     
-    emit receiveMessageToLog(message);
+    emit receiveMessageToLog(isClient, message);
 }
 
 void SocketManager::addClientToServer(QTcpSocket *clientSocket)

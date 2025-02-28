@@ -1,33 +1,38 @@
 #ifndef WORKERTHREAD_H
 #define WORKERTHREAD_H
 
+#include <QObject>
 #include <QThread>
-#include <QDebug>
+#include <QTcpServer>
+#include <QTcpSocket>
 
-class WorkerThread : public QThread {
+class WorkerThread : public QObject {
     Q_OBJECT
-
 public:
-    explicit WorkerThread(QThread *parent = nullptr);
+    explicit WorkerThread(QObject *parent = nullptr);
+    ~WorkerThread();
 
-    void run() override {
-        // Your thread logic here
-        qDebug() << "WorkerThread running (ID:" << workerId << ")";
-    }
+public slots:
+    void startServer(int port);
+    void connectToServer(const QString &host, int port);
+    void stop();
+
+signals:
+    void serverMessageReceived(const QString &message);
+    void clientMessageReceived(const QString &message);
+    void serverStarted(bool success);
+    void clientConnected(bool success);
+
+private slots:
+    void handleNewConnection();
+    void readServerData();
+    void readClientData();
 
 private:
-    int workerId = 0; // Initialize member variable
+    QThread thread;
+    QTcpServer server;
+    QTcpSocket *clientSocket = nullptr;
+    QList<QTcpSocket*> serverClients; // 서버에 연결된 클라이언트 소켓 관리
 };
-
-//// In your main function or other code:
-//int main() {
-//    WorkerThread worker1; // Uses the default constructor
-//    WorkerThread worker2(123); // Uses the constructor with an argument
-
-//    worker1.start();
-//    worker2.start();
-
-//    // ...
-//}
 
 #endif // WORKERTHREAD_H

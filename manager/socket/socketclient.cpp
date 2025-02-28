@@ -1,12 +1,16 @@
 #include "socketclient.h"
 #include <QDebug>
 
-SocketClient::SocketClient(QObject *parent) : QObject(parent),
-    tcpSocket(new QTcpSocket(this))
+SocketClient::SocketClient(QObject *parent)
+    : QObject(parent)
+    , tcpSocket(new QTcpSocket(this))
 {
+    // bool connected = connect(tcpSocket, &QTcpSocket::readyRead, this, &SocketClient::readServerData);
+    // qDebug() << "readyRead signal connected:" << connected;
+
     connect(tcpSocket, &QTcpSocket::connected, this, &SocketClient::onConnected);
     connect(tcpSocket, &QTcpSocket::disconnected, this, &SocketClient::onDisconnected);
-    connect(tcpSocket, &QTcpSocket::readyRead, this, &SocketClient::readServerData);
+    // connect(tcpSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onSocketError(QAbstractSocket::SocketError)));
 }
 
 SocketClient::~SocketClient()
@@ -22,6 +26,8 @@ int SocketClient::connectToServer(const QString &host, quint16 port)
     // 연결이 완료될 때까지 대기    // 2sec
     if (tcpSocket->waitForConnected(2000))
     {
+        qDebug() << "Successfully connected to" << host << ":" << port;
+        connect(tcpSocket, &QTcpSocket::readyRead, this, &SocketClient::readServerData);
         return 1;   // 연결 성공
     }
     else
@@ -45,7 +51,8 @@ int SocketClient::connectToServer(const QString &host, quint16 port)
     return 0;
 }
 
-bool SocketClient::sendMessage(const QString &message) {
+bool SocketClient::sendMessage(const QString &message)
+{
     if (tcpSocket->state() != QAbstractSocket::ConnectedState) {
         qDebug() << "Not connected to server";
         return false;
@@ -71,8 +78,10 @@ QString SocketClient::receiveMessage()
 
 void SocketClient::readServerData()
 {
+    qDebug() << "Bytes available:" << tcpSocket->bytesAvailable();
     lastReceivedMessage = QString::fromUtf8(tcpSocket->readAll()).trimmed();
     qDebug() << "Received from server:" << lastReceivedMessage;
+    emit messageReceived(false, lastReceivedMessage);
 }
 
 void SocketClient::onConnected()
@@ -85,3 +94,7 @@ void SocketClient::onDisconnected()
     qDebug() << "Disconnected from server!";
 }
 
+// void SocketClient::onSocketError(QAbstractSocket::SocketError error)
+// {
+//     qDebug() << "[client] Socket error:" << error << "-" << tcpSocket->errorString();
+// }

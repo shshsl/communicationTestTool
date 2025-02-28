@@ -22,11 +22,12 @@ public:
 
 signals:
     void newClientConnected(QTcpSocket *clientSocket);
-    void notifyReceiveToManager(QString);
+    void notifyReceiveToManager(bool, QString);
 
 private slots:
     void handleNewConnection();
     void readClientData();
+    // void onSocketError(QAbstractSocket::SocketError error);
 
 private:
     void testFunction();

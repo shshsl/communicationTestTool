@@ -7,6 +7,7 @@ SocketServer::SocketServer(QObject *parent) : QObject(parent),
     tcpServer(new QTcpServer(this))
 {
     connect(tcpServer, &QTcpServer::newConnection, this, &SocketServer::handleNewConnection);
+//    connect(tcpServer, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onSocketError(QAbstractSocket::SocketError)));
 }
 
 SocketServer::~SocketServer()
@@ -71,7 +72,7 @@ void SocketServer::readClientData()
         m_sLastReceived = QString::fromUtf8(client->readAll()).trimmed();
         qDebug() << "Received from client:" << m_sLastReceived;
         
-        emit notifyReceiveToManager(m_sLastReceived);
+        emit notifyReceiveToManager(true, m_sLastReceived);
     }
 }
 
@@ -81,22 +82,18 @@ bool SocketServer::sendMessage(const QString &message)
         qDebug() << "No clients connected to send message";
         return false;
     }
-
-    QByteArray data = message.toUtf8() + "\n"; // 메시지 끝에 개행 추가
+    QByteArray data = message.toUtf8() + "\n";
+    bool allSent = true;
     for (QTcpSocket *client : clients)
     {
         if (client->state() == QAbstractSocket::ConnectedState)
         {
             qint64 bytesWritten = client->write(data);
-            client->flush(); // 버퍼 비우기
-            if (bytesWritten == -1)
-            {
-                qDebug() << "Failed to send message to client:" << client->errorString();
-                return false;
-            }
+            qDebug() << "Sending" << data << "to" << client->peerAddress().toString();
+            client->flush();
         }
     }
-    return true;
+    return allSent;
 }
 
 QString SocketServer::receiveMessage()
@@ -106,3 +103,8 @@ QString SocketServer::receiveMessage()
 //    m_slastReceivedMessage.clear(); // 한 번 읽으면 초기화
 //    return received;
 }
+
+// void SocketServer::onSocketError(QAbstractSocket::SocketError error)
+// {
+//     qDebug() << "[server] Socket error:" << error << "-" << tcpServer->errorString();
+// }
