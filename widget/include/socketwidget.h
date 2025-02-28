@@ -71,6 +71,7 @@ private:
     void testFunction();
     int autoLayoutRowCount();
     void logClear();
+    void onTabChanged();
     
 private:
     SocketManager *socketManager;

@@ -40,34 +40,7 @@ void SocketWidget::setupConnections()
 {
     connect(socketManager, &SocketManager::addClientView, this, &SocketWidget::addClient);
     connect(socketManager, &SocketManager::receiveMessageToLog, this, &SocketWidget::receiveMessage);
-    connect(socketTabWidget, &QTabWidget::currentChanged, [=]() {
-        int currentTab = socketTabWidget->currentIndex();
-        QString tabName = "";
-        QString pButton = "";
-        switch (currentTab)
-        {
-        case 0:
-            m_nCurrentTab = Communication::Socket::ConnectOption::Server;
-            pButton = "Start";
-            tabName = "TCP Server";
-            break;
-        case 1:
-            m_nCurrentTab = Communication::Socket::ConnectOption::Client;
-            pButton = "Connect";
-            tabName = "TCP Client";
-            break;
-        case 2:
-            m_nCurrentTab = Communication::Socket::ConnectOption::Udp;
-            pButton = "UDP Server";
-            tabName = "UDP";
-            break;
-
-        default:
-            break;
-        }
-        optionPushButton->setText(pButton);
-        qDebug() << "** Current Tab: " << tabName;
-    });
+    connect(socketTabWidget, &QTabWidget::currentChanged, this, &SocketWidget::onTabChanged);
     connect(sendButton, &QPushButton::clicked, this, &SocketWidget::sendMessage);
     connect(logClearButton, &QPushButton::clicked, this, &SocketWidget::logClear);
 }
@@ -75,7 +48,8 @@ void SocketWidget::setupConnections()
 void SocketWidget::clearConnections()
 {
     disconnect(socketManager, &SocketManager::addClientView, this, &SocketWidget::addClient);
-    disconnect(socketTabWidget, &QTabWidget::currentChanged, this, nullptr);
+    disconnect(socketManager, &SocketManager::receiveMessageToLog, this, &SocketWidget::receiveMessage);
+    disconnect(socketTabWidget, &QTabWidget::currentChanged, this, &SocketWidget::onTabChanged);
     disconnect(sendButton, &QPushButton::clicked, this, &SocketWidget::sendMessage);
     disconnect(logClearButton, &QPushButton::clicked, this, &SocketWidget::logClear);
 }
@@ -427,3 +401,32 @@ void SocketWidget::logClear()
     dataView->clear();
 }
 
+void SocketWidget::onTabChanged()
+{
+    int currentTab = socketTabWidget->currentIndex();
+        QString tabName = "";
+        QString pButton = "";
+        switch (currentTab)
+        {
+        case 0:
+            m_nCurrentTab = Communication::Socket::ConnectOption::Server;
+            pButton = "Start";
+            tabName = "TCP Server";
+            break;
+        case 1:
+            m_nCurrentTab = Communication::Socket::ConnectOption::Client;
+            pButton = "Connect";
+            tabName = "TCP Client";
+            break;
+        case 2:
+            m_nCurrentTab = Communication::Socket::ConnectOption::Udp;
+            pButton = "UDP Server";
+            tabName = "UDP";
+            break;
+
+        default:
+            break;
+        }
+        optionPushButton->setText(pButton);
+        qDebug() << "** Current Tab: " << tabName;
+}

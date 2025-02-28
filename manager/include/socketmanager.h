@@ -38,8 +38,8 @@ public slots:
     void receive(const QString &message);
 
 private:
-    void setupConnections();
-    void clearConnections();
+    void setupServerConnections();
+    void clearServerConnections();
 
 private:
     SocketServer* server;

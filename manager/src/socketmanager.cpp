@@ -5,31 +5,33 @@ SocketManager::SocketManager(QObject *parent) : QObject(parent),
     client(nullptr),
     isServerMode(false)
 {
-    setupConnections();
+    // setupConnections();  // due to null paramter. / block.
 }
 
 SocketManager::~SocketManager()
 {
-    clearConnections();
+    clearServerConnections();
     if (server) delete server;
     if (client) delete client;
 }
 
-void SocketManager::setupConnections()
+void SocketManager::setupServerConnections()
 {
+    connect(server, &SocketServer::newClientConnected, this, &SocketManager::addClientToServer);
     connect(server, &SocketServer::notifyReceiveToManager, this, &SocketManager::receive);
 }
 
-void SocketManager::clearConnections()
+void SocketManager::clearServerConnections()
 {
-    
+    disconnect(server, &SocketServer::newClientConnected, this, &SocketManager::addClientToServer);
+    disconnect(server, &SocketServer::notifyReceiveToManager, this, &SocketManager::receive);
 }
 
 bool SocketManager::startAsServer(int port)
 {
     server = new SocketServer();
     isServerMode = true;
-    connect(server, &SocketServer::newClientConnected, this, &SocketManager::addClientToServer);
+    setupServerConnections();
     
     return server->startServer(port);
 }
