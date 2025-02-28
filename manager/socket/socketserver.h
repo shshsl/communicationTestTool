@@ -6,6 +6,7 @@
 #include <QObject>
 #include <QDateTime>
 #include <QDebug>
+#include <QTimer>
 
 class SocketServer : public QObject {
     Q_OBJECT

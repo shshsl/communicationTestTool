@@ -23,6 +23,8 @@
 #include <QCoreApplication>
 #include <QThread>
 #include <QApplication>
+
+// #include "manager/socket/socketclient.h"
 //  ]]
 
 #include "manager/include/socketmanager.h"
@@ -63,6 +65,9 @@ public slots:
 private slots:
     void onOptionButtonClicked();
     void updateElapsedTime();
+    
+    //test 
+    // void onMessageReceived(bool, const QString &message);
 
 private:
     void setupConnections();
@@ -79,6 +84,10 @@ private:
     int autoLayoutRowCount();
     void logClear();
     void onTabChanged();
+    
+    //test
+    // void connectClient();
+    
     
 private:
     SocketManager *socketManager;

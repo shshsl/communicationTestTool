@@ -54,12 +54,18 @@ void SocketServer::handleNewConnection()
     
     QTcpSocket *clientSocket = tcpServer->nextPendingConnection();
     clients.append(clientSocket);
+    qDebug() << "Client connected:" << clientSocket->peerAddress().toString();
+    qDebug() << "Total clients:" << clients.size();
+    // QTimer::singleShot(10, [this]() { sendMessage("⭐⭐ Welcome to the server ! ⭐⭐"); });
+    
     connect(clientSocket, &QTcpSocket::readyRead, this, &SocketServer::readClientData);
     connect(clientSocket, &QTcpSocket::disconnected, [this, clientSocket]() {
         clients.removeOne(clientSocket);
         clientSocket->deleteLater();
+        qDebug() << "Client disconnected, remaining:" << clients.size();
     });
     emit newClientConnected(clientSocket);
+
     qDebug() << "New client connected";
     qDebug() << "==================== + ====================";
 }
@@ -91,6 +97,15 @@ bool SocketServer::sendMessage(const QString &message)
         {
             qint64 bytesWritten = client->write(data);
             qDebug() << "Sending" << data << "to" << client->peerAddress().toString();
+            if (bytesWritten == -1)
+            {
+                qDebug() << "Write failed:" << client->errorString();
+                allSent = false;
+            }
+            else
+            {
+                qDebug() << "Wrote" << bytesWritten << "bytes successfully";
+            }
             client->flush();
         }
     }

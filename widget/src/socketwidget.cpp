@@ -189,7 +189,7 @@ void SocketWidget::createDataLayout(QGridLayout *parentLayout)
         dataViewLabel->setText("▶️ Receive Data - ( from Server ):");
         clientDataView = new QTextEdit(this);
         clientDataView->setEnabled(true);
-        clientDataView->setReadOnly(false);
+        clientDataView->setReadOnly(true);
         clientDataView->setPlaceholderText("...");
         parentLayout->addWidget(clientDataView, autoLayoutRowCount(), 0);
     }
@@ -198,7 +198,7 @@ void SocketWidget::createDataLayout(QGridLayout *parentLayout)
         dataViewLabel->setText("▶️ Receive Data - ( from Client(s) ):");
         serverDataView = new QTextEdit(this);
         serverDataView->setEnabled(true);
-        serverDataView->setReadOnly(false);
+        serverDataView->setReadOnly(true);
         serverDataView->setPlaceholderText("...");
         parentLayout->addWidget(serverDataView, autoLayoutRowCount(), 0);
     }
@@ -485,27 +485,6 @@ void SocketWidget::onOptionButtonClicked()
     }
 }
 
-
-// ipv4 유효성 검사 Test 용.
-// #include <QRegExp>
-
-// bool isValidIPv4(const QString &ip)
-// {
-//     QRegExp ipPattern("^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$");
-//     if (!ipPattern.exactMatch(ip))
-//         return false;
-
-//     QStringList parts = ip.split(".");
-//     for (const QString &part : parts)
-//     {
-//         bool ok;
-//         int num = part.toInt(&ok);
-//         if (!ok || num < 0 || num > 255)
-//             return false;
-//     }
-//     return true;
-// }
-
 int SocketWidget::autoLayoutRowCount()
 {
     // 한 기능 내에 top-down 으로 순차적이므로 사용순서 주의.
@@ -550,3 +529,22 @@ void SocketWidget::onTabChanged()
         qDebug() << "** Current Tab: " << tabName;
 }
 
+
+
+
+//test
+
+/*
+void SocketWidget::connectClient()
+{
+    socketClient = new SocketClient(this);
+    connect(socketClient, &SocketClient::messageReceived, this, &SocketWidget::onMessageReceived);
+    socketClient->connectToServer("172.30.1.43", 8080);
+    qDebug() << "Client connecting";
+}
+
+void SocketWidget::onMessageReceived(bool, const QString &message)
+{
+    qDebug() << "Widget received:" << message;
+}
+*/
