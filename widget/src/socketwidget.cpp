@@ -1,9 +1,14 @@
 #include "widget/include/socketwidget.h"
 
 SocketWidget::SocketWidget(QWidget *parent) 
-    : QWidget(parent), socketManager(new SocketManager(this))
-    , m_nLayoutRow(0), m_nLayoutColumn(0), clientsLayout(nullptr), socketTabWidget(new QTabWidget(this))
-    , clientsListView(nullptr), clientsModel(nullptr)
+    : QWidget(parent)
+    , socketManager(new SocketManager(this))
+    , socketTabWidget(new QTabWidget(this))
+    , m_nLayoutRow(0)
+    , m_nLayoutColumn(0)
+    , clientsLayout(nullptr)
+    , clientsListView(nullptr)
+    , clientsModel(nullptr)
 {
     // UI 생성
     QGridLayout *layout = new QGridLayout(this);
