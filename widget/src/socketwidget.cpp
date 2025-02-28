@@ -356,59 +356,65 @@ void SocketWidget::sendMessageToServer()
     {
         return ;
     }
-    
-    qDebug() << "client - SendButton ---------------------------------";
-    QString message = clientSendView->toPlainText().trimmed();
 
-    qDebug() << "client - SendButton ************************ ";
+    QString message = clientSendView->toPlainText().trimmed();
+    QString timestamp = "";
+    QString formattedMessage = "";
     if (!message.isEmpty())
     {
         if (socketManager->send(message))
         {
-            qDebug() << "Sent: " << message;
+            qDebug() << "c-Sent: " << message;
             clientSendView->clear();
-            clientDataView->append(message);
+            timestamp = QDateTime::currentDateTime().toString("[yyyy/MM/dd][HH:mm:ss] ");
+            formattedMessage = QStringLiteral("%1[client]: %2").arg(timestamp, message);
+            clientDataView->append(formattedMessage);
         }
         else
         {
-            qDebug() << "Failed to send: " << message;
+            qDebug() << "c-Failed to send: " << message;
         }
     }
     else
     {
-        qDebug() << "No message to send!";
+        qDebug() << "c-No message to send!";
     }
-    qDebug() << "client - SendButton ==================================== ";
 }
 
 void SocketWidget::sendMessageToClient()
 {
     // qDebug() << "serverSendButton" << serverSendButton;
     // qDebug() << "clientSendButton" << clientSendButton;
+    
+    qDebug() << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@";
+    
+    
     if(!serverSendButton || !clientSendButton)
     {
         return ;
     }
 
     QString message = serverSendView->toPlainText().trimmed();
+    QString timestamp = "";
+    QString formattedMessage = "";
     if (!message.isEmpty())
     {
         if (socketManager->send(message))
         {
-            qDebug() << "Sent: " << message;
+            qDebug() << "s-Sent: " << message;
             serverSendView->clear();
-            timestamp = QDateTime::currentDateTime().toString("[yyyy/MM/dd] [HH:mm:ss] ");
-            formattedMessage = QStringLiteral("%1[client]: %2").arg(timestamp, message);
-            QMetaObject::invokeMethod(clientDataView, "append", Qt::QueuedConnection, Q_ARG(QString, formattedMessage));
+            timestamp = QDateTime::currentDateTime().toString("[yyyy/MM/dd][HH:mm:ss] ");
+            formattedMessage = QStringLiteral("%1[server]: %2").arg(timestamp, message);
+            serverDataView->append(formattedMessage);
         }
         else
         {
-            qDebug() << "Failed to send: " << message;
+            qDebug() << "s-Failed to send: " << message;
         }
     }
     else
     {
-        qDebug() << "No message to send!";
+        qDebug() << "s-No message to send!";
     }
 }
 
@@ -421,13 +427,13 @@ void SocketWidget::receiveMessage(bool isClient, const QString &message)
     QString formattedMessage = "";
     if (isClient)
     {
-        timestamp = QDateTime::currentDateTime().toString("[yyyy/MM/dd] [HH:mm:ss] ");
+        timestamp = QDateTime::currentDateTime().toString("[yyyy/MM/dd][HH:mm:ss] ");
         formattedMessage = QStringLiteral("%1[client]: %2").arg(timestamp, message);
         QMetaObject::invokeMethod(serverDataView, "append", Qt::QueuedConnection, Q_ARG(QString, formattedMessage));
     }
     else
     {
-        timestamp = QDateTime::currentDateTime().toString("[yyyy/MM/dd] [HH:mm:ss] ");
+        timestamp = QDateTime::currentDateTime().toString("[yyyy/MM/dd][HH:mm:ss] ");
         formattedMessage = QStringLiteral("%1[server]: %2").arg(timestamp, message);
         QMetaObject::invokeMethod(clientDataView, "append", Qt::QueuedConnection, Q_ARG(QString, formattedMessage));
     }

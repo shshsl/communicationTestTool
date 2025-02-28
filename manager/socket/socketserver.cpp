@@ -61,6 +61,7 @@ void SocketServer::handleNewConnection()
     });
     emit newClientConnected(clientSocket);
     qDebug() << "New client connected";
+    qDebug() << "==================== + ====================";
 }
 
 void SocketServer::readClientData()
