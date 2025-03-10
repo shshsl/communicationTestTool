@@ -3,6 +3,13 @@
 
 #define MAX_USER_COUNT  10
 
+class NetworkError : public std::runtime_error
+{
+public:
+    explicit NetworkError(const QString& message) 
+        : std::runtime_error(message.toStdString()) {}
+};
+
 SocketServer::SocketServer(QObject *parent) : QObject(parent),
     tcpServer(new QTcpServer(this))
 {
@@ -15,15 +22,23 @@ SocketServer::~SocketServer()
     stopServer();
 }
 
-int SocketServer::startServer(quint16 port)
+bool SocketServer::startServer(quint16 port)
 {
-    if (!tcpServer->listen(QHostAddress::Any, port))
+    try
     {
-        qDebug() << "Server failed to start:" << tcpServer->errorString();
-        return 0;
+        if (!tcpServer->listen(QHostAddress::Any, port))
+        {
+            throw NetworkError(tr("Failed to start server: %1")
+                .arg(tcpServer->errorString()));
+        }
+        qDebug() << "Server started on port" << port;
+        return true;
     }
-    qDebug() << "Server started on port" << port;
-    return 1;
+    catch (const NetworkError& e)
+    {
+//        emit error(e.what());
+        return false;
+    }
 }
 
 void SocketServer::stopServer()

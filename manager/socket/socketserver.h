@@ -15,7 +15,7 @@ public:
     explicit SocketServer(QObject *parent = nullptr);
     ~SocketServer();
     
-    int startServer(quint16 port);
+    bool startServer(quint16 port);
     void stopServer();
     
     bool sendMessage(const QString &message);
@@ -24,6 +24,7 @@ public:
 signals:
     void newClientConnected(QTcpSocket *clientSocket);
     void notifyReceiveToManager(bool, QString);
+//    void error(NetworkError& e);
 
 private slots:
     void handleNewConnection();
